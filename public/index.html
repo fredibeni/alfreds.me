@@ -74,15 +74,12 @@
     }
     .card-body { display: flex; align-items: center; gap: 22px; }
     .card-text { flex: 1; min-width: 0; }
-    .card-top { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
     .card h2 {
       font-family: 'Sono', ui-monospace, SFMono-Regular, Menlo, monospace;
       font-weight: 400; letter-spacing: 0.01em;
       font-size: 23px; margin: 0;
     }
     .card p { margin: 8px 0 0; color: var(--muted); font-size: 16px; }
-    .arrow { color: var(--accent); font-size: 20px; transition: transform .15s ease; }
-    a.card:hover .arrow { transform: translate(3px, -3px); }
     .thumb {
       width: 176px; height: auto; flex-shrink: 0;
       border-radius: 9px; border: 1px solid var(--line);
@@ -111,10 +108,7 @@
       <a class="card" href="/best-place/">
         <div class="card-body">
           <div class="card-text">
-            <div class="card-top">
-              <h2>Best Place</h2>
-              <span class="arrow">&#8599;</span>
-            </div>
+            <h2>Best Place</h2>
             <p>Find where to live: filter world cities by tax, cost of living, climate, etc.</p>
           </div>
           <img class="thumb" src="/best-place-thumb.jpg" width="420" height="210" loading="lazy" alt="World map showing the cities covered by Best Place" />

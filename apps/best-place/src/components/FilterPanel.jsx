@@ -131,6 +131,9 @@ export default function FilterPanel({ draft, setDraft, onApply, onClear, cities,
 
   return (
     <aside className="panel filters">
+      <a className="back-home" href="/">
+        <span aria-hidden="true">&#8592;</span> Back to Home
+      </a>
       <h1>Best Place</h1>
       <p className="tagline">Find where to live. All filters are optional.</p>
 

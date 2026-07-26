@@ -38,6 +38,15 @@ body {
 .panel::-webkit-scrollbar-thumb { background: var(--line); border-radius: 6px; }
 
 /* ---- Filter panel ---- */
+.back-home {
+  display: inline-flex; align-items: center; gap: 6px;
+  margin: 0 0 12px; padding: 5px 10px 5px 8px;
+  border: 1px solid var(--line); border-radius: 7px;
+  background: var(--panel-2); color: var(--muted);
+  font-size: 12px; text-decoration: none; line-height: 1;
+  transition: color .15s ease, border-color .15s ease, background .15s ease;
+}
+.back-home:hover { color: var(--text); border-color: var(--accent-2); background: rgba(58,160,255,.12); }
 .filters h1 { margin: 4px 0 2px; font-size: 22px; letter-spacing: .3px; }
 .filters .tagline { margin: 0 0 16px; color: var(--muted); font-size: 13px; }
 .filters section { border-top: 1px solid var(--line); padding: 14px 0 6px; }
@@ -66,10 +75,12 @@ body {
   font-size: 9px; font-style: italic; font-weight: 700; line-height: 1;
   cursor: help; position: relative; vertical-align: middle; outline: none;
 }
+/* display:none (not just visibility) so the hidden tooltip adds no scrollable
+   width to the sidebar, which otherwise gets a stray horizontal scrollbar. */
 .info .info-tip {
-  visibility: hidden; opacity: 0; transition: opacity .12s ease;
+  display: none;
   position: absolute; bottom: calc(100% + 7px); left: 50%; transform: translateX(-50%);
-  width: 210px; z-index: 800;
+  width: 190px; z-index: 800;
   background: #0b1420; border: 1px solid var(--line); border-radius: 8px;
   padding: 8px 10px; font-size: 11.5px; font-style: normal; font-weight: 400;
   color: var(--text); line-height: 1.45; text-align: left;
@@ -79,7 +90,7 @@ body {
   content: ""; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
   border: 5px solid transparent; border-top-color: var(--line);
 }
-.info:hover .info-tip, .info:focus .info-tip { visibility: visible; opacity: 1; }
+.info:hover .info-tip, .info:focus .info-tip { display: block; }
 
 /* In the detail card (top of the map) show the tooltip below the icon to avoid clipping. */
 .detail-card .info .info-tip { bottom: auto; top: calc(100% + 7px); }
