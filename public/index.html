@@ -4,80 +4,93 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Alfred Strabel</title>
-  <meta name="description" content="Alfred Strabel — personal site and projects." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg: #f7f5f0; --ink: #1b1a17; --muted: #6b675f; --card: #ffffff;
-      --line: #e6e2d9; --accent: #2f6f4f; --accent-soft: #e7f0ea;
+      --bg: #f7f5f0;
+      --ink: #1b1a17;
+      --muted: #6b675f;
+      --card: #ffffff;
+      --line: #e6e2d9;
+      --accent: #2f6f4f;
     }
     * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-    body { margin: 0; font-family: 'Inter', system-ui, -apple-system, sans-serif;
-      color: var(--ink); background: var(--bg); line-height: 1.6; -webkit-font-smoothing: antialiased; }
+    body {
+      margin: 0;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      color: var(--ink);
+      background: var(--bg);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
     .wrap { max-width: 720px; margin: 0 auto; padding: 0 24px; }
-    header { padding: 88px 0 40px; }
-    .eyebrow { font-size: 13px; letter-spacing: .14em; text-transform: uppercase;
-      color: var(--accent); font-weight: 600; margin: 0 0 18px; }
-    h1 { font-family: 'Fraunces', Georgia, serif; font-weight: 600;
-      font-size: clamp(40px, 8vw, 64px); line-height: 1.05; margin: 0 0 20px; letter-spacing: -0.01em; }
-    .lede { font-size: 19px; color: var(--muted); max-width: 54ch; margin: 0; }
-    main { padding: 24px 0 96px; }
-    .section-label { font-size: 13px; letter-spacing: .14em; text-transform: uppercase;
-      color: var(--muted); font-weight: 600; margin: 48px 0 20px; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
-    a.card { display: block; text-decoration: none; color: inherit; background: var(--card);
-      border: 1px solid var(--line); border-radius: 16px; padding: 26px 28px;
-      transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease; }
-    a.card:hover { transform: translateY(-3px); box-shadow: 0 14px 34px -18px rgba(30,30,20,.35); border-color: #d6d1c5; }
-    .card-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-    .card h3 { font-family: 'Fraunces', Georgia, serif; font-weight: 600; font-size: 24px; margin: 0; }
-    .card p { margin: 10px 0 0; color: var(--muted); font-size: 16px; }
-    .tag { display: inline-block; font-size: 12px; font-weight: 600; letter-spacing: .04em;
-      color: var(--accent); background: var(--accent-soft); padding: 5px 11px; border-radius: 999px; white-space: nowrap; }
-    .arrow { color: var(--accent); font-size: 22px; transition: transform .15s ease; display:inline-block; }
+
+    header { padding: 96px 0 48px; }
+    h1 {
+      font-family: 'Fraunces', Georgia, serif;
+      font-weight: 600;
+      font-size: clamp(48px, 10vw, 84px);
+      line-height: 1.02;
+      letter-spacing: -0.02em;
+      margin: 0 0 20px;
+    }
+    .profile {
+      display: inline-flex; align-items: center; gap: 8px;
+      color: var(--accent); text-decoration: none;
+      font-size: 17px; font-weight: 500;
+    }
+    .profile:hover { text-decoration: underline; }
+    .profile svg { width: 19px; height: 19px; fill: currentColor; }
+
+    main { padding: 0 0 96px; }
+    .section-label {
+      font-size: 13px; letter-spacing: .14em; text-transform: uppercase;
+      color: var(--muted); font-weight: 600;
+      margin: 0 0 20px; padding-bottom: 12px; border-bottom: 1px solid var(--line);
+    }
+    a.card {
+      display: block; text-decoration: none; color: inherit;
+      background: var(--card); border: 1px solid var(--line); border-radius: 16px;
+      padding: 26px 28px;
+      transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+    }
+    a.card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 14px 34px -18px rgba(30,30,20,.35);
+      border-color: #d6d1c5;
+    }
+    .card-top { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
+    .card h2 {
+      font-family: 'Fraunces', Georgia, serif; font-weight: 600;
+      font-size: 26px; margin: 0;
+    }
+    .card p { margin: 8px 0 0; color: var(--muted); font-size: 16px; }
+    .arrow { color: var(--accent); font-size: 20px; transition: transform .15s ease; }
     a.card:hover .arrow { transform: translate(3px, -3px); }
-    .stack { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
-    .chip { font-size: 12px; color: var(--muted); background: #f0ede6; border: 1px solid var(--line); padding: 4px 10px; border-radius: 8px; }
-    footer { padding: 40px 0 64px; border-top: 1px solid var(--line); color: var(--muted); font-size: 14px; }
-    footer a { color: var(--accent); text-decoration: none; }
-    footer a:hover { text-decoration: underline; }
-    .links { display: flex; gap: 20px; flex-wrap: wrap; }
   </style>
 </head>
 <body>
   <div class="wrap">
     <header>
-      <p class="eyebrow">Alfred Strabel</p>
-      <h1>I build small, useful things for the web.</h1>
-      <p class="lede">Side projects at the intersection of data and everyday decisions — where to live, how to train, what to learn next. A few of them live here.</p>
+      <h1>Alfred Strabel</h1>
+      <a class="profile" href="https://www.linkedin.com/in/alfredstrabel/" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.63-1.85 3.36-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.07 2.07 0 1 1 0-4.13 2.07 2.07 0 0 1 0 4.13zM7.12 20.45H3.55V9h3.57v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0z"/></svg>
+        LinkedIn
+      </a>
     </header>
+
     <main>
       <div class="section-label">Projects</div>
       <a class="card" href="/best-place/">
         <div class="card-top">
-          <h3>Best Place</h3>
-          <span class="tag">Live app</span>
+          <h2>Best Place</h2>
+          <span class="arrow">&#8599;</span>
         </div>
-        <p>An interactive world map to decide where to live — filter the 200 largest global cities by income &amp; capital-gains tax, cost of living, climate, and population, and see matches ranked on the map.</p>
-        <div class="stack">
-          <span class="chip">React</span>
-          <span class="chip">Leaflet</span>
-          <span class="chip">Open-Meteo</span>
-          <span class="chip">Numbeo</span>
-        </div>
-        <div class="stack" style="margin-top:18px;"><span class="arrow">&#8599;</span></div>
+        <p>Find where to live: filter world cities by tax, cost of living, climate and population.</p>
       </a>
     </main>
-    <footer>
-      <div class="links">
-        <a href="mailto:alfred.strabel@gmail.com">Email</a>
-        <a href="https://www.linkedin.com/" target="_blank" rel="noopener">LinkedIn</a>
-      </div>
-      <p style="margin-top:16px;">&#169; <span id="yr"></span> Alfred Strabel &middot; alfreds.me</p>
-    </footer>
   </div>
-  <script>document.getElementById('yr').textContent = new Date().getFullYear();</script>
 </body>
 </html>
