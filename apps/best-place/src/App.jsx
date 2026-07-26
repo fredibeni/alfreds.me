@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 import FilterPanel, { MIN_POP } from "./components/FilterPanel.jsx";
 import MapView from "./components/MapView.jsx";
 import Sidebar from "./components/Sidebar.jsx";
@@ -170,6 +171,7 @@ export default function App() {
         />
       </div>
       <Analytics />
+      <SpeedInsights />
     </>
   );
 }
