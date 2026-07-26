@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.vercel/
+.DS_Store
+*.log
+
+# Large, regenerable scraping intermediates (rebuild with apps/best-place/scripts)
+apps/best-place/scripts/out/

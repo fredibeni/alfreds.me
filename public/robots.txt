@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+# Data files powering the Best Place app - not pages, keep them out of search results.
+Disallow: /best-place/data.json
+Disallow: /best-place/grid.json
+Disallow: /best-place/world.geojson
+
+Sitemap: https://alfreds.me/sitemap.xml

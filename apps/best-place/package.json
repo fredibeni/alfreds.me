@@ -1,0 +1,29 @@
+{
+  "name": "best_place",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "data:cities": "node scripts/01-cities.mjs",
+    "data:tax": "node scripts/02-tax.mjs",
+    "data:weather": "node scripts/04-weather.mjs",
+    "data:life": "node scripts/09-life-expectancy.mjs",
+    "data:build": "node scripts/05-build.mjs",
+    "data:all": "node scripts/01-cities.mjs && node scripts/02-tax.mjs && node scripts/04-weather.mjs && node scripts/05-build.mjs"
+  },
+  "dependencies": {
+    "leaflet": "^1.9.4",
+    "leaflet.heat": "^0.2.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-leaflet": "^4.2.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "vite": "^5.4.11",
+    "xlsx": "^0.18.5"
+  }
+}
