@@ -15,6 +15,7 @@
     "data:all": "node scripts/01-cities.mjs && node scripts/02-tax.mjs && node scripts/04-weather.mjs && node scripts/05-build.mjs"
   },
   "dependencies": {
+    "@vercel/analytics": "^2.0.1",
     "leaflet": "^1.9.4",
     "leaflet.heat": "^0.2.0",
     "react": "^18.3.1",

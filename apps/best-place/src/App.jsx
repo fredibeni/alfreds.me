@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { Analytics } from "@vercel/analytics/react";
 import FilterPanel, { MIN_POP } from "./components/FilterPanel.jsx";
 import MapView from "./components/MapView.jsx";
 import Sidebar from "./components/Sidebar.jsx";
@@ -97,75 +98,78 @@ export default function App() {
   if (!data) return <div className="loading">Loading cities…</div>;
 
   return (
-    <div className="layout">
-      <FilterPanel
-        draft={draft}
-        setDraft={setDraft}
-        onApply={onApply}
-        onClear={onClear}
-        cities={cities}
-        dirty={dirty}
-      />
+    <>
+      <div className="layout">
+        <FilterPanel
+          draft={draft}
+          setDraft={setDraft}
+          onApply={onApply}
+          onClear={onClear}
+          cities={cities}
+          dirty={dirty}
+        />
 
-      <main className="map-wrap">
-        <MapView
-          geojson={geojson}
-          grid={grid}
-          appliedClimate={{
-            maxRain: applied.maxRain, minTemp: applied.minTemp, maxTemp: applied.maxTemp,
-          }}
+        <main className="map-wrap">
+          <MapView
+            geojson={geojson}
+            grid={grid}
+            appliedClimate={{
+              maxRain: applied.maxRain, minTemp: applied.minTemp, maxTemp: applied.maxTemp,
+            }}
+            matches={matches}
+            climate={climate}
+            taxFilters={taxFilters}
+            taxActive={taxActive}
+            selectedContinents={selectedContinents}
+            continentsActive={continentsActive}
+            appliedVersion={appliedVersion}
+            selectedCity={selected}
+            onSelect={setSelectedCity}
+            hoveredCityId={hoveredCityId}
+            selectedCountry={selectedCountry}
+            onSelectCountry={setSelectedCountry}
+          />
+          {selected && (
+            <CityDetail
+              city={selected}
+              filters={applied}
+              currentCity={currentCity}
+              climate={climate}
+              onClose={() => setSelectedCity(null)}
+            />
+          )}
+          <div className="legend">
+            <span className="legend-title">
+              Climate heatmap
+              {!climate && (
+                <>
+                  <br />
+                  <span>(climate filter not set)</span>
+                </>
+              )}
+            </span>
+            <div className="legend-bar" />
+            <div className="legend-labels"><span>fewer days</span><span>more days</span></div>
+            <div className="legend-hint">days/year meeting climate filters</div>
+          </div>
+        </main>
+
+        <Sidebar
           matches={matches}
           climate={climate}
           taxFilters={taxFilters}
-          taxActive={taxActive}
-          selectedContinents={selectedContinents}
-          continentsActive={continentsActive}
-          appliedVersion={appliedVersion}
+          incomeActive={incomeActive}
           selectedCity={selected}
           onSelect={setSelectedCity}
-          hoveredCityId={hoveredCityId}
+          totalCount={cities.length}
+          selectedContinents={selectedContinents}
+          setSelectedContinents={setSelectedContinents}
+          onHoverCity={setHoveredCityId}
           selectedCountry={selectedCountry}
-          onSelectCountry={setSelectedCountry}
+          onClearCountry={() => setSelectedCountry(null)}
         />
-        {selected && (
-          <CityDetail
-            city={selected}
-            filters={applied}
-            currentCity={currentCity}
-            climate={climate}
-            onClose={() => setSelectedCity(null)}
-          />
-        )}
-        <div className="legend">
-          <span className="legend-title">
-            Climate heatmap
-            {!climate && (
-              <>
-                <br />
-                <span>(climate filter not set)</span>
-              </>
-            )}
-          </span>
-          <div className="legend-bar" />
-          <div className="legend-labels"><span>fewer days</span><span>more days</span></div>
-          <div className="legend-hint">days/year meeting climate filters</div>
-        </div>
-      </main>
-
-      <Sidebar
-        matches={matches}
-        climate={climate}
-        taxFilters={taxFilters}
-        incomeActive={incomeActive}
-        selectedCity={selected}
-        onSelect={setSelectedCity}
-        totalCount={cities.length}
-        selectedContinents={selectedContinents}
-        setSelectedContinents={setSelectedContinents}
-        onHoverCity={setHoveredCityId}
-        selectedCountry={selectedCountry}
-        onClearCountry={() => setSelectedCountry(null)}
-      />
-    </div>
+      </div>
+      <Analytics />
+    </>
   );
 }
