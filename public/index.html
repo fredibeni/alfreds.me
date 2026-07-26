@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="color-scheme" content="dark" />
   <meta name="theme-color" content="#0f1621" />
-  <title>Alfred Strabel</title>
+  <title>Alfred</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Sono:wght@200..800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -31,7 +31,7 @@
     }
     .wrap { max-width: 720px; margin: 0 auto; padding: 0 24px; }
 
-    header { padding: 96px 0 48px; }
+    header { padding: 96px 0 40px; }
     h1 {
       font-family: 'Sono', ui-monospace, SFMono-Regular, Menlo, monospace;
       font-weight: 300;
@@ -48,16 +48,23 @@
     .profile:hover { text-decoration: underline; }
     .profile svg { width: 19px; height: 19px; fill: currentColor; }
 
+    .intro {
+      margin: 28px 0 0;
+      font-size: 17px;
+      color: var(--muted);
+      max-width: 52ch;
+    }
+
     main { padding: 0 0 96px; }
     .section-label {
       font-size: 13px; letter-spacing: .14em; text-transform: uppercase;
       color: var(--muted); font-weight: 600;
-      margin: 0 0 20px; padding-bottom: 12px; border-bottom: 1px solid var(--line);
+      margin: 44px 0 20px; padding-bottom: 12px; border-bottom: 1px solid var(--line);
     }
     a.card {
       display: block; text-decoration: none; color: inherit;
       background: var(--card); border: 1px solid var(--line); border-radius: 16px;
-      padding: 26px 28px;
+      padding: 22px 24px;
       transition: transform .15s ease, background .15s ease, border-color .15s ease;
     }
     a.card:hover {
@@ -65,6 +72,8 @@
       background: var(--card-hover);
       border-color: #3d5170;
     }
+    .card-body { display: flex; align-items: center; gap: 22px; }
+    .card-text { flex: 1; min-width: 0; }
     .card-top { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
     .card h2 {
       font-family: 'Sono', ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -74,6 +83,16 @@
     .card p { margin: 8px 0 0; color: var(--muted); font-size: 16px; }
     .arrow { color: var(--accent); font-size: 20px; transition: transform .15s ease; }
     a.card:hover .arrow { transform: translate(3px, -3px); }
+    .thumb {
+      width: 176px; height: auto; flex-shrink: 0;
+      border-radius: 9px; border: 1px solid var(--line);
+      display: block;
+    }
+    @media (max-width: 620px) {
+      .card-body { flex-direction: column; align-items: stretch; gap: 18px; }
+      .thumb { width: 100%; order: 2; }
+      .card-text { order: 1; }
+    }
   </style>
 </head>
 <body>
@@ -84,16 +103,22 @@
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.63-1.85 3.36-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.07 2.07 0 1 1 0-4.13 2.07 2.07 0 0 1 0 4.13zM7.12 20.45H3.55V9h3.57v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0z"/></svg>
         LinkedIn
       </a>
+      <p class="intro">Hi, I'm Alfred. This is a site for my vibe-coding projects.</p>
     </header>
 
     <main>
       <div class="section-label">Projects</div>
       <a class="card" href="/best-place/">
-        <div class="card-top">
-          <h2>Best Place</h2>
-          <span class="arrow">&#8599;</span>
+        <div class="card-body">
+          <div class="card-text">
+            <div class="card-top">
+              <h2>Best Place</h2>
+              <span class="arrow">&#8599;</span>
+            </div>
+            <p>Find where to live: filter world cities by tax, cost of living, climate, etc.</p>
+          </div>
+          <img class="thumb" src="/best-place-thumb.jpg" width="420" height="210" loading="lazy" alt="World map showing the cities covered by Best Place" />
         </div>
-        <p>Find where to live: filter world cities by tax, cost of living, climate and population.</p>
       </a>
     </main>
   </div>
