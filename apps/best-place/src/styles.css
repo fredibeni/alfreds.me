@@ -50,10 +50,18 @@ body {
   transition: color .15s ease, border-color .15s ease, background .15s ease;
 }
 .back-home:hover { color: var(--text); border-color: var(--accent-2); background: rgba(58,160,255,.12); }
-/* Back link beside the title block, matching the mobile header. */
-.panel-head { display: flex; align-items: center; gap: 10px; margin: 0 0 16px; }
-.panel-head .back-home { flex: none; margin: 0; white-space: nowrap; }
-.panel-title { min-width: 0; }
+/* Back link beside the title block, matching the mobile header — including the three-column
+   grid with equal side tracks (the third left empty), so the title centres against the panel
+   rather than against whatever space the back link leaves over. */
+.panel-head {
+  --head-side: 70px;
+  display: grid;
+  grid-template-columns: var(--head-side) 1fr var(--head-side);
+  align-items: center; gap: 8px;
+  margin: 0 0 16px;
+}
+.panel-head .back-home { justify-self: start; margin: 0; white-space: nowrap; }
+.panel-title { min-width: 0; text-align: center; }
 .filters h1 { margin: 0; font-size: 22px; letter-spacing: .3px; }
 .filters .tagline { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
 .filters section { border-top: 1px solid var(--line); padding: 14px 0 6px; }
