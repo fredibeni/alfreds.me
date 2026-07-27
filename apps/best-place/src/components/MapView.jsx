@@ -427,6 +427,11 @@ export default function MapView({
         zoom={DEFAULT_ZOOM}
         minZoom={2}
         worldCopyJump
+        /* Draw vectors into a canvas rather than as SVG nodes. The 1753 city markers plus 258
+           country polygons are 2271 SVG elements that Leaflet re-projects and rewrites on every
+           pan and zoom; that cost a measured 743 ms per zoom, and Safari — including every iOS
+           browser — is far slower at it than Chrome, which is why the map dragged worst there. */
+        preferCanvas
         zoomAnimation={false} /* the heatmap is a custom canvas that can't transform in perfect
                                  lockstep with the SVG borders mid-animation (it visibly lagged);
                                  with animation off, borders + heatmap re-render together in one
@@ -522,8 +527,12 @@ function MapLayers({
     const onMapMouseMove = (e) => {
       if (!openTooltipRef.current) return;
       const el = openTooltipRef.current.getElement?.();
+      // Canvas-rendered layers have no element of their own. There Leaflet hit-tests the
+      // pointer itself on every mousemove and fires a reliable mouseout, so this net is not
+      // needed — and without the guard it would close every tooltip the instant it opened.
+      if (!el) return;
       const under = document.elementFromPoint(e.originalEvent.clientX, e.originalEvent.clientY);
-      if (el && under === el) return;
+      if (under === el) return;
       close();
     };
     map.on("mousemove", onMapMouseMove);
@@ -641,7 +650,11 @@ function MapLayers({
             }}
             center={[c.lat, c.lon]}
             radius={selected ? 9 : hovered ? 8 : 5}
-            pane="markerPane"
+            /* Deliberately NOT pane="markerPane". Under the canvas renderer each pane gets its
+               own canvas, and a marker canvas sitting above the country canvas would receive
+               every mouse event and stop countries being hoverable or clickable. Sharing the
+               default overlay pane puts markers and countries in one renderer, which hit-tests
+               them together; markers still draw on top because they are added later. */
             pathOptions={{
               color: selected || hovered ? "#3aa0ff" : "#ffffff",
               weight: selected || hovered ? 2 : 1,
