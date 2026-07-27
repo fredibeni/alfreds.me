@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { MapContainer, GeoJSON, CircleMarker, useMap } from "react-leaflet";
 import L from "leaflet";
+import { buildTempCdf, daysInRange } from "../climate.js";
 
 const WATER = "#000000";  // black ocean (map background)
 const LAND = "#223247";   // land base tint (shown where no climate grid covers)
@@ -358,32 +359,30 @@ export default function MapView({
     return m;
   }, [geojson]);
 
+  // Collapsing the rain axis is the expensive half, and it only depends on maxRain — so it is
+  // memoised apart from the temperature sliders, which then cost two array reads per cell.
+  const tempCdf = useMemo(
+    () => (grid && climate ? buildTempCdf(grid.packed, grid.cells.length, num(appliedClimate.maxRain)) : null),
+    [grid, climate, appliedClimate.maxRain]
+  );
+
   // Per-cell qualifying-day counts for the applied climate thresholds.
   const cellDays = useMemo(() => {
-    if (!grid || !climate) return null;
-    const maxRain = num(appliedClimate.maxRain);
+    if (!grid || !tempCdf) return null;
     const minTemp = num(appliedClimate.minTemp);
     const maxTemp = num(appliedClimate.maxTemp);
-    const { tmax, precip, days, cells } = grid;
-    const years = Math.max(1, Math.round(days / 365)); // 1 now, 5 after the 2021-2025 backfill
-    const out = new Int16Array(cells.length);
-    for (let i = 0; i < cells.length; i++) {
-      const base = i * days;
-      let n = 0;
-      for (let d = 0; d < days; d++) {
-        const t = tmax[base + d];
-        if (t === -128) continue; // no data
-        if (minTemp !== null && t < minTemp) continue;
-        if (maxTemp !== null && t > maxTemp) continue;
-        if (maxRain !== null && precip[base + d] > maxRain) continue;
-        n++;
-      }
-      out[i] = Math.round(n / years); // averaged qualifying days per year
+    const years = Math.max(1, Math.round(grid.days / 365));
+    const out = new Int16Array(grid.cells.length);
+    for (let i = 0; i < out.length; i++) {
+      out[i] = Math.round(daysInRange(tempCdf, i, minTemp, maxTemp) / years); // days per year
     }
     return out;
-  }, [grid, climate, appliedClimate.maxRain, appliedClimate.minTemp, appliedClimate.maxTemp]);
+  }, [grid, tempCdf, appliedClimate.minTemp, appliedClimate.maxTemp]);
 
-  const geoKey = useMemo(() => `${appliedVersion}|${climate}`, [appliedVersion, climate]);
+  // NOTE: the country layer used to be keyed on `${appliedVersion}|${climate}` to force a
+  // restyle, which remounted all 258 detailed coastline polygons on every Apply (measured ~1s
+  // of frozen UI). react-leaflet already calls setStyle() whenever the `style` prop identity
+  // changes, and styleFn is a fresh closure every render, so the remount bought nothing.
 
   // Fully declarative: border colour reflects selection/hover state directly (rather than
   // mutating layers imperatively), so it can never be clobbered by react-leaflet re-applying
@@ -433,7 +432,6 @@ export default function MapView({
           selectedContinents={selectedContinents}
           ckeyToContinent={ckeyToContinent}
           styleFn={styleFn}
-          geoKey={geoKey}
           matches={matches}
           selectedCity={selectedCity}
           onSelect={onSelect}
@@ -457,7 +455,7 @@ export default function MapView({
 // and the country borders/greying), then draws the layers.
 function MapLayers({
   geojson, grid, cellDays, climate, taxActive, taxFilters, continentsActive, selectedContinents, ckeyToContinent,
-  styleFn, geoKey, matches, selectedCity, onSelect, hoveredCityId, selectedCountry, onSelectCountry,
+  styleFn, matches, selectedCity, onSelect, hoveredCityId, selectedCountry, onSelectCountry,
   hoveredCkey, onHoverCountry, onIneligibleClick,
 }) {
   const map = useMap();
@@ -571,7 +569,7 @@ function MapLayers({
 
       {geojson && (
         <GeoJSON
-          key={geoKey}
+          key="countries"
           data={geojson}
           style={styleFn}
           onEachFeature={(feature, layer) => {

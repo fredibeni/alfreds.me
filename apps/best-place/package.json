@@ -5,13 +5,14 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "node scripts/10-pack.mjs && vite build",
     "preview": "vite preview",
     "data:cities": "node scripts/01-cities.mjs",
     "data:tax": "node scripts/02-tax.mjs",
     "data:weather": "node scripts/04-weather.mjs",
     "data:life": "node scripts/09-life-expectancy.mjs",
     "data:build": "node scripts/05-build.mjs",
+    "data:pack": "node scripts/10-pack.mjs",
     "data:all": "node scripts/01-cities.mjs && node scripts/02-tax.mjs && node scripts/04-weather.mjs && node scripts/05-build.mjs"
   },
   "dependencies": {

@@ -7,6 +7,7 @@ import Sidebar from "./components/Sidebar.jsx";
 import CityDetail from "./components/CityDetail.jsx";
 import { BackHome, TITLE, TAGLINE } from "./components/AppHeader.jsx";
 import { EMPTY_FILTERS, useMatches } from "./hooks/useMatches.js";
+import { readPacked } from "./climate.js";
 import useIsMobile from "./hooks/useIsMobile.js";
 import { CONTINENTS } from "./continents.js";
 
@@ -25,20 +26,13 @@ function normalizeFilters(draft) {
   return f;
 }
 
-// Decode a base64 string into an Int8Array (grid climate arrays are stored this way).
-function decodeI8(b64) {
-  const bin = atob(b64);
-  const arr = new Int8Array(bin.length);
-  for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i) << 24 >> 24;
-  return arr;
-}
-
 export default function App() {
   const isMobile = useIsMobile();
 
   const [data, setData] = useState(null);
   const [geojson, setGeojson] = useState(null);
   const [grid, setGrid] = useState(null);
+  const [cityClimate, setCityClimate] = useState(null);
   const [error, setError] = useState(null);
 
   const [draft, setDraft] = useState(EMPTY_FILTERS);
@@ -51,20 +45,21 @@ export default function App() {
   // Bumped by the Cities tab's "Add your city" link; FilterPanel focuses its city box on change.
   const [focusCityRequest, setFocusCityRequest] = useState(0);
 
-  // The map's two heavy assets (grid.json ~17 MB, world.geojson ~3 MB) are only ever used by
-  // MapView, so on mobile they wait until the Map tab is first opened. That keeps the initial
-  // mobile payload to data.json alone, and the Filters/Cities tabs are usable straight away.
+  // The map's assets are only ever used by MapView, so on mobile they wait until the Map tab is
+  // first opened — the Filters and Cities tabs are then usable off the city data alone.
   const mapNeeded = !isMobile || tab === "map";
 
   useEffect(() => {
-    fetch(`${import.meta.env.BASE_URL}data.json`)
-      .then((r) => r.json())
-      .then((d) => {
-        for (const c of d.cities) {
-          c.tmax = c.tmax ? decodeI8(c.tmax) : null;
-          c.precip = c.precip ? decodeI8(c.precip) : null;
-          c.years = c.tmax ? Math.max(1, Math.round(c.tmax.length / 365)) : 0;
-        }
+    // City metadata plus the packed per-city climate histograms (see src/climate.js). Each city
+    // carries its own index into the shared buffer so the detail card can query it directly.
+    Promise.all([
+      fetch(`${import.meta.env.BASE_URL}cities.json`).then((r) => r.json()),
+      fetch(`${import.meta.env.BASE_URL}city-clim.bin`).then((r) => r.arrayBuffer()),
+    ])
+      .then(([d, buf]) => {
+        const packed = readPacked(buf, d.cities.length);
+        d.cities.forEach((c, i) => { c.packed = packed; c.index = i; });
+        setCityClimate(packed);
         setData(d);
       })
       .catch((e) => setError(String(e)));
@@ -74,10 +69,13 @@ export default function App() {
   useEffect(() => {
     if (!mapNeeded || mapAssetsRequested.current) return;
     mapAssetsRequested.current = true;
-    fetch(`${import.meta.env.BASE_URL}world.geojson`).then((r) => r.json()).then(setGeojson).catch(() => {});
-    fetch(`${import.meta.env.BASE_URL}grid.json`)
-      .then((r) => r.json())
-      .then((g) => setGrid({ ...g, tmax: decodeI8(g.tmax), precip: decodeI8(g.precip) }))
+    fetch(`${import.meta.env.BASE_URL}world.min.geojson`).then((r) => r.json()).then(setGeojson).catch(() => {});
+    // Climate grid: a small metadata JSON plus the packed histograms (see src/climate.js).
+    Promise.all([
+      fetch(`${import.meta.env.BASE_URL}grid-meta.json`).then((r) => r.json()),
+      fetch(`${import.meta.env.BASE_URL}grid-clim.bin`).then((r) => r.arrayBuffer()),
+    ])
+      .then(([meta, buf]) => setGrid({ ...meta, packed: readPacked(buf, meta.cells.length) }))
       .catch(() => {});
   }, [mapNeeded]);
 
@@ -89,7 +87,7 @@ export default function App() {
   }, [mapNeeded]);
 
   const cities = data?.cities;
-  const { rows, matches: allMatches, currentCity, climate } = useMatches(cities, applied);
+  const { rows, matches: allMatches, currentCity, climate } = useMatches(cities, applied, cityClimate);
 
   const continentsActive = selectedContinents.size < CONTINENTS.length;
   const continentMatches = useMemo(

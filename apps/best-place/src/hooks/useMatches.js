@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { buildTempCdf, daysInRange } from "../climate.js";
 
 // Empty filter state. `null` means "not set" (optional filters).
 export const EMPTY_FILTERS = {
@@ -22,31 +23,9 @@ export function hasClimateFilter(f) {
   return isSet(f.maxRain) || isSet(f.minTemp) || isSet(f.maxTemp);
 }
 
-// Count days in the year meeting the set rain/temperature constraints.
-// Daytime temperature = daily maximum (tmax).
-export function countQualifyingDays(city, f) {
-  if (!city.tmax) return 0;
-  const maxRain = num(f.maxRain);
-  const minTemp = num(f.minTemp);
-  const maxTemp = num(f.maxTemp);
-  let n = 0;
-  for (let i = 0; i < city.tmax.length; i++) {
-    const t = city.tmax[i];
-    const p = city.precip ? city.precip[i] : 0;
-    if (t === -128) continue; // no-data sentinel
-    if (maxRain !== null && !(p != null && p <= maxRain)) continue;
-    if (minTemp !== null && !(t != null && t >= minTemp)) continue;
-    if (maxTemp !== null && !(t != null && t <= maxTemp)) continue;
-    n++;
-  }
-  // Average across the years of data held (counting per year then averaging == total / years).
-  return Math.round(n / yearsOf(city));
-}
-
-// Number of whole years of daily data stored for a city (1 now, 5 after the 2021-2025 backfill).
+// Number of whole years of daily data behind a city's climate figures.
 export function yearsOf(city) {
-  if (city.years) return city.years;
-  return city.tmax ? Math.max(1, Math.round(city.tmax.length / 365)) : 1;
+  return city.days ? Math.max(1, Math.round(city.days / 365)) : 1;
 }
 
 // Cost-of-living percentage vs. the chosen current city.
@@ -62,27 +41,36 @@ export function netIncomePercentOf(city, currentCity) {
 }
 
 // Annual climate summaries for the detail view (daily maximum = "daytime" temperature).
+// These read exact per-city totals rather than the histogram, whose end buckets are clamped and
+// so could not reproduce a true sum or maximum.
 export function climateSummary(city) {
-  if (!city.tmax) return null;
-  const valid = (a) => a.filter((v) => v != null && v !== -128);
-  const t = valid(city.tmax);
-  const years = yearsOf(city);
-  const avg = (a) => (a.length ? a.reduce((s, v) => s + v, 0) / a.length : 0);
+  if (!city.days) return null;
   return {
-    avgHigh: +avg(t).toFixed(1),
-    maxHigh: t.length ? Math.max(...t) : null,
+    avgHigh: +(city.tSum / city.nObs).toFixed(1),
+    maxHigh: city.tHigh,
     // Rainfall totalled over all years, then averaged back to a single year.
-    annualRain: city.precip ? Math.round(valid(city.precip).reduce((s, v) => s + v, 0) / years) : null,
+    annualRain: city.hasPrecip ? Math.round(city.pSum / yearsOf(city)) : null,
   };
 }
 
 // Compute, for every city, its derived metrics + whether it matches the applied filters.
 // Returns { rows, matches } where matches are sorted best-first.
-export function useMatches(cities, filters) {
+export function useMatches(cities, filters, packed) {
+  // Collapsing the rain axis is the only expensive step and depends on maxRain alone, so it is
+  // memoised apart from the rest — moving a temperature slider then costs two array reads per
+  // city instead of a 1826-day scan.
+  const maxRain = num(filters.maxRain);
+  const tempCdf = useMemo(
+    () => (cities && packed ? buildTempCdf(packed, cities.length, maxRain) : null),
+    [cities, packed, maxRain]
+  );
+
   return useMemo(() => {
     if (!cities) return { rows: [], matches: [] };
     const f = filters;
     const climate = hasClimateFilter(f);
+    const minTemp = num(f.minTemp);
+    const maxTemp = num(f.maxTemp);
     // Raw record for the internal % comparisons (needs colIndex / netIncome, which it has).
     const currentRaw = f.currentCityId ? cities.find((c) => c.id === f.currentCityId) : null;
 
@@ -93,8 +81,9 @@ export function useMatches(cities, filters) {
     const minPop = num(f.minPopulation);
     const maxPop = num(f.maxPopulation);
 
-    const rows = cities.map((c) => {
-      const qualifyingDays = countQualifyingDays(c, f);
+    const rows = cities.map((c, i) => {
+      // Averaged across the years held: counting per year then averaging == total / years.
+      const qualifyingDays = tempCdf ? Math.round(daysInRange(tempCdf, i, minTemp, maxTemp) / yearsOf(c)) : 0;
       const colPercent = colPercentOf(c, currentRaw);
       const netIncomePercent = netIncomePercentOf(c, currentRaw);
 
@@ -132,5 +121,5 @@ export function useMatches(cities, filters) {
     // Return the computed row for the current city so the detail view has its qualifyingDays.
     const currentCity = f.currentCityId ? rows.find((r) => r.id === f.currentCityId) || currentRaw : null;
     return { rows, matches, currentCity, climate };
-  }, [cities, filters]);
+  }, [cities, filters, tempCdf, maxRain]);
 }
