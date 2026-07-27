@@ -1,16 +1,9 @@
 import { useMemo, useRef, useState } from "react";
 import { EMPTY_FILTERS } from "../hooks/useMatches.js";
+import InfoIcon from "./InfoIcon.jsx";
+import { BackHome, TITLE, TAGLINE } from "./AppHeader.jsx";
 
 const MIN_POP = 300000;
-
-// Small "i" icon that reveals explanatory text on hover.
-function InfoIcon({ text }) {
-  return (
-    <span className="info" tabIndex={0} role="img" aria-label={text}>
-      i<span className="info-tip">{text}</span>
-    </span>
-  );
-}
 
 // A slider that supports an "Any" (unset) state at its non-constraining extreme.
 // `anyAt` is the slider value that means "no constraint" -> stored as null.
@@ -123,7 +116,10 @@ const tempFmt = (v) => `${v}°C`;
 const rainFmt = (v) => `${v} mm`;
 const popFmt = (v) => (v >= 1e6 ? `${(v / 1e6).toFixed(1)}M` : `${Math.round(v / 1e3)}k`);
 
-export default function FilterPanel({ draft, setDraft, onApply, onClear, cities, dirty }) {
+// `showHeader` is false on mobile, where the back link / title / tagline live in the shell
+// above the tabs instead. `mobile` keeps the primary action tappable even when nothing has
+// changed, since on mobile it doubles as "take me to the results tab".
+export default function FilterPanel({ draft, setDraft, onApply, onClear, cities, dirty, showHeader = true, mobile = false }) {
   const set = (k) => (v) => setDraft((d) => ({ ...d, [k]: v }));
 
   const needsCity =
@@ -131,11 +127,13 @@ export default function FilterPanel({ draft, setDraft, onApply, onClear, cities,
 
   return (
     <aside className="panel filters">
-      <a className="back-home" href="/">
-        <span aria-hidden="true">&#8592;</span> Back to Home
-      </a>
-      <h1>Best Place</h1>
-      <p className="tagline">Find where to live. All filters are optional.</p>
+      {showHeader && (
+        <>
+          <BackHome />
+          <h1>{TITLE}</h1>
+          <p className="tagline">{TAGLINE}</p>
+        </>
+      )}
 
       <section>
         <h2>Taxes</h2>
@@ -186,8 +184,10 @@ export default function FilterPanel({ draft, setDraft, onApply, onClear, cities,
       </section>
 
       <div className="actions">
-        <button className="btn primary" onClick={onApply} disabled={!dirty}>
-          {dirty ? "Apply filters" : "Applied"}
+        {/* Mobile keeps one stable label: the button always applies whatever is set and moves
+            you to the results, so relabelling it per dirty-state was just noise. */}
+        <button className="btn primary" onClick={onApply} disabled={!mobile && !dirty}>
+          {mobile ? "See cities" : dirty ? "Apply filters" : "Applied"}
         </button>
         <button className="btn ghost" onClick={onClear}>Clear</button>
       </div>

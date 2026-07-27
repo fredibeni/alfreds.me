@@ -1,4 +1,5 @@
 :root {
+  color-scheme: dark;
   --bg: #0f1621;
   --panel: #161f2e;
   --panel-2: #1e2a3d;
@@ -17,6 +18,8 @@ body {
   background: var(--bg);
   color: var(--text);
   -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%; /* stop iOS inflating text in the narrow panels */
+  text-size-adjust: 100%;
 }
 
 .loading {
@@ -70,9 +73,10 @@ body {
 /* ---- Info icon + hover tooltip ---- */
 .info {
   display: inline-flex; align-items: center; justify-content: center;
-  width: 14px; height: 14px; margin-left: 5px; border-radius: 50%;
+  width: 14px; height: 14px; margin-left: 5px; padding: 0;
+  border: none; border-radius: 50%;
   background: var(--line); color: var(--text);
-  font-size: 9px; font-style: italic; font-weight: 700; line-height: 1;
+  font-family: inherit; font-size: 9px; font-style: italic; font-weight: 700; line-height: 1;
   cursor: help; position: relative; vertical-align: middle; outline: none;
 }
 /* display:none (not just visibility) so the hidden tooltip adds no scrollable
@@ -90,7 +94,12 @@ body {
   content: ""; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
   border: 5px solid transparent; border-top-color: var(--line);
 }
-.info:hover .info-tip, .info:focus .info-tip { display: block; }
+.info:focus .info-tip { display: block; }
+/* Touch devices emulate :hover and then latch it until you tap elsewhere, which left the tip
+   stuck open over the control below. There, opening it is a deliberate tap (:focus) only. */
+@media (hover: hover) {
+  .info:hover .info-tip { display: block; }
+}
 
 /* In the detail card (top of the map) show the tooltip below the icon to avoid clipping. */
 .detail-card .info .info-tip { bottom: auto; top: calc(100% + 7px); }
@@ -161,7 +170,9 @@ input[type="range"]::-moz-range-thumb {
   background: rgba(16,22,33,.94); border: 1px solid var(--danger); color: var(--text);
   padding: 8px 14px; border-radius: 8px; font-size: 13px;
   box-shadow: 0 10px 30px rgba(0,0,0,.4);
+  max-width: calc(100% - 24px); text-align: center;
 }
+.map-toast.neutral { border-color: var(--line); color: var(--muted); }
 
 .legend {
   position: absolute; left: 12px; bottom: 12px; z-index: 500;
@@ -177,8 +188,11 @@ input[type="range"]::-moz-range-thumb {
 .legend-hint { font-size: 10.5px; color: var(--muted); margin-bottom: 4px; line-height: 1.4; }
 
 /* ---- Sidebar ---- */
-.sidebar-head { display: flex; align-items: baseline; justify-content: space-between; }
-.sidebar h2 { font-size: 15px; margin: 4px 0 12px; }
+/* Stacked rather than heading-left / count-right: side by side, the longer heading and the
+   count together overflow the 320px sidebar and both wrap. (Mobile hides the count, so this
+   is just the heading there.) */
+.sidebar-head { display: flex; flex-direction: column; align-items: flex-start; margin-bottom: 12px; }
+.sidebar h2 { font-size: 15px; margin: 4px 0 0; }
 .sidebar .count { color: var(--muted); font-size: 12px; }
 .sidebar .empty { color: var(--muted); font-size: 13px; line-height: 1.5; }
 
@@ -190,8 +204,22 @@ input[type="range"]::-moz-range-thumb {
 .country-filter .link-btn { flex-shrink: 0; }
 
 .continent-filter { margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid var(--line); }
-.continent-filter-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.continent-filter.collapsed { padding-bottom: 10px; }
+.continent-filter-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+.continent-filter.collapsed .continent-filter-head { margin-bottom: 0; }
 .continent-filter .field-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .03em; }
+/* Wrapper around the heading; a <button> only where the section actually collapses. */
+.continent-toggle {
+  display: flex; align-items: center; gap: 6px; min-width: 0;
+  margin: 0; padding: 0; border: none; background: none;
+  font: inherit; color: inherit; text-align: left;
+}
+button.continent-toggle { cursor: pointer; }
+.continent-hint { font-size: 11px; color: var(--muted); }
+/* Section disclosure: points right when closed, down when open. The chevron's own artwork
+   points down, so the open state is the untransformed one. */
+.continent-caret { flex: none; width: 14px; height: 14px; color: var(--accent); transition: transform .15s ease; }
+.continent-filter.collapsed .continent-caret { transform: rotate(-90deg); color: var(--muted); }
 .link-btn {
   background: none; border: none; padding: 0; font-size: 11px; color: var(--accent-2);
   cursor: pointer;
@@ -206,12 +234,33 @@ input[type="range"]::-moz-range-thumb {
 .pill.active { background: rgba(255,180,0,.14); color: var(--accent); border-color: var(--accent); }
 
 .match-list { list-style: none; margin: 0; padding: 0; }
-.match {
+.match { border-radius: 9px; border: 1px solid transparent; }
+.match-row {
   display: flex; align-items: center; gap: 10px;
-  padding: 10px 8px; border-radius: 9px; cursor: pointer; border: 1px solid transparent;
+  padding: 10px 8px; border-radius: 8px; cursor: pointer;
 }
+.match-row:focus-visible { outline: 2px solid var(--accent-2); outline-offset: -2px; }
 .match:hover { background: var(--panel-2); }
 .match.selected { background: var(--panel-2); border-color: var(--accent); }
+
+/* Inline detail drop-down (Cities tab on mobile) */
+.match-caret {
+  flex: none; width: 13px; height: 13px; color: var(--muted);
+  transition: transform .15s ease;
+}
+.match.selected .match-caret { transform: rotate(180deg); color: var(--accent); }
+.match-detail { margin: 0 8px; padding: 2px 2px 12px; border-top: 1px solid var(--line); }
+
+/* Jump straight to this city on the Map tab, without expanding the row. */
+.match-pin {
+  flex: none; display: inline-flex; align-items: center; justify-content: center;
+  width: 32px; height: 32px; padding: 0;
+  background: none; border: none; border-radius: 8px;
+  color: var(--muted); cursor: pointer;
+}
+.match-pin:hover { color: var(--accent); background: rgba(255,180,0,.12); }
+.match-pin:active { background: rgba(255,180,0,.22); }
+.match-pin:focus-visible { outline: 2px solid var(--accent-2); outline-offset: -2px; }
 .rank { width: 20px; text-align: right; color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; }
 .match-main { flex: 1; min-width: 0; }
 .match-name { font-size: 14px; font-weight: 600; }
@@ -244,10 +293,211 @@ input[type="range"]::-moz-range-thumb {
 .detail-label { color: var(--muted); }
 .detail-value { text-align: right; }
 .detail-note { color: var(--muted); font-style: normal; font-size: 11px; }
-/* comparison layout: label | selected | current */
-.detail-row.compare { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 8px; align-items: baseline; }
+/* comparison layout: label | selected | current.
+   Each row is its own grid, so the tracks have to be fr-based to line up between rows — an
+   `auto` label column would size per row and stagger. The 1.55 ratio is what keeps the longest
+   label ("Post-tax income /mo") on one line while still leaving room for a 8-digit population. */
+.detail-row.compare { display: grid; grid-template-columns: 1.55fr 1fr 1fr; gap: 8px; align-items: baseline; }
 .detail-row.compare .detail-label { text-align: left; }
 .detail-row.compare .detail-value { text-align: right; }
 .detail-row.compare .compare-col { color: var(--accent-2); }
 .detail-heads .detail-value { font-size: 11px; color: var(--text); font-weight: 600; border-bottom: 1px solid var(--line); padding-bottom: 3px; }
 .detail-heads .compare-col { color: var(--accent-2); }
+
+/* ==========================================================================
+   Mobile
+   Below 900px App renders `.mobile-shell` (header + tab bar + one panel at a
+   time) instead of the three-column `.layout`, so everything under here is
+   scoped to that class rather than to a media query — the two layouts are
+   different component trees and never coexist.
+   ========================================================================== */
+@media (max-width: 900px) {
+  /* The shell owns all scrolling; individual panels scroll internally. */
+  body { overflow: hidden; overscroll-behavior: none; -webkit-tap-highlight-color: transparent; }
+}
+
+.mobile-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  height: 100dvh; /* survives the mobile browser's collapsing address bar */
+  overflow: hidden;
+}
+
+/* ---- Header: title centred on the page, back link to its left ----
+   Three columns with matching fixed side tracks (the third is left empty) rather than a flex
+   row, so the title is centred against the page — not against the space the back link leaves
+   over — while still being unable to run underneath it. */
+.mobile-head {
+  flex: none;
+  display: grid;
+  grid-template-columns: var(--head-side) 1fr var(--head-side);
+  align-items: center; gap: 8px;
+  --head-side: 74px;
+  background: var(--panel);
+  padding: 10px 14px 10px;
+  padding-top: max(10px, env(safe-area-inset-top));
+  padding-left: max(14px, env(safe-area-inset-left));
+  padding-right: max(14px, env(safe-area-inset-right));
+}
+.mobile-head .back-home {
+  justify-self: start; margin: 0; padding: 8px 10px 8px 8px; white-space: nowrap;
+}
+.mobile-title { min-width: 0; text-align: center; }
+.mobile-title h1 { margin: 0; font-size: 20px; letter-spacing: .3px; }
+.mobile-title .tagline { margin: 2px 0 0; color: var(--muted); font-size: 12px; line-height: 1.35; }
+
+/* ---- Tab bar ---- */
+.tabs {
+  flex: none;
+  display: flex; gap: 2px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+  padding: 0 8px;
+  padding-left: max(8px, env(safe-area-inset-left));
+  padding-right: max(8px, env(safe-area-inset-right));
+}
+.tab {
+  flex: 1 1 0;
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  min-height: 46px; padding: 10px 6px;
+  background: none; border: none; border-bottom: 2px solid transparent; margin-bottom: -1px;
+  color: var(--muted); font: inherit; font-size: 13.5px; font-weight: 600;
+  cursor: pointer; touch-action: manipulation;
+}
+.tab[aria-selected="true"] { color: var(--accent); border-bottom-color: var(--accent); }
+.tab-count {
+  font-size: 11px; font-weight: 600; font-variant-numeric: tabular-nums;
+  padding: 1px 6px; border-radius: 999px;
+  background: var(--panel-2); color: var(--muted);
+}
+.tab[aria-selected="true"] .tab-count { background: rgba(255,180,0,.16); color: var(--accent); }
+
+/* Landscape phones: claw back some of the chrome so the panel keeps a usable height. */
+@media (max-height: 500px) {
+  .mobile-head { padding-top: max(6px, env(safe-area-inset-top)); padding-bottom: 6px; }
+  .mobile-title h1 { font-size: 18px; }
+  .tab { min-height: 40px; padding: 8px 6px; }
+}
+
+/* ---- Panels: all mounted, only the active one displayed ---- */
+/* Horizontal safe-area insets live here rather than on each panel, so the panels can use a
+   plain 14px gutter that full-bleed children (the sticky action bar) can cancel out. */
+.tab-panels {
+  position: relative; flex: 1 1 auto; min-height: 0;
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+.tab-panel { position: absolute; inset: 0; }
+.tab-panel[hidden] { display: none; }
+.tab-panel > * { height: 100%; }
+
+.mobile-shell .panel {
+  --gutter: 14px; /* single source for the side padding and anything that full-bleeds past it */
+  padding: 14px var(--gutter) calc(22px + env(safe-area-inset-bottom));
+  overflow-x: hidden; /* a stray wide child must never scroll the panel sideways */
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  /* Phones overlay their scrollbars, but a desktop browser at this width reserves a 10px
+     gutter out of the content box — which sat entirely on the right and left every row's
+     highlight 10px short of centre. Hide it so the rows are symmetric on every device. */
+  scrollbar-width: none;
+}
+.mobile-shell .panel::-webkit-scrollbar { width: 0; height: 0; }
+/* No bottom padding, so the sticky action bar below parks flush with the panel's edge. */
+.mobile-shell .filters { padding-bottom: 0; }
+/* The title moved to the shell, so the first section shouldn't open with a divider. */
+.mobile-shell .filters section:first-of-type { border-top: none; padding-top: 0; }
+
+/* ---- Touch-sized controls ---- */
+.mobile-shell .field { margin-bottom: 18px; }
+.mobile-shell .field-label { font-size: 14px; }
+/* 16px keeps iOS Safari from zooming the viewport when a field takes focus. */
+.mobile-shell .field input, .mobile-shell .field select { font-size: 16px; padding: 10px 12px; }
+.mobile-shell input[type="range"] { height: 6px; margin: 12px 0 4px; }
+.mobile-shell input[type="range"]::-webkit-slider-thumb { width: 26px; height: 26px; border-width: 3px; }
+.mobile-shell input[type="range"]::-moz-range-thumb { width: 22px; height: 22px; border-width: 3px; }
+.mobile-shell .suggestions li { padding: 11px 10px; font-size: 14px; }
+.mobile-shell .pill { font-size: 12.5px; padding: 7px 11px; }
+.mobile-shell .continent-toggle { min-height: 40px; }
+.mobile-shell .continent-caret { width: 16px; height: 16px; }
+.mobile-shell .link-btn { font-size: 12.5px; padding: 4px 0; }
+.mobile-shell .btn { padding: 14px; font-size: 15px; }
+/* Full-bleed opaque footer (the desktop gradient fade lets the sliders show through the
+   buttons at this size), negative margins cancelling the panel's 14px gutter. */
+.mobile-shell .actions {
+  margin: 12px calc(-1 * var(--gutter)) 0;
+  padding: 12px var(--gutter) calc(12px + env(safe-area-inset-bottom));
+  background: var(--panel);
+  border-top: 1px solid var(--line);
+}
+
+/* Tooltips span the full row and open downward. Anchoring them to the icon (as on desktop)
+   overflows the panel whenever the icon sits mid-row, and the panels clip horizontally — so an
+   ancestor becomes the positioning context instead.
+   For a filter that ancestor is the whole `.field`, not just its label: anchored to the label,
+   the tip opened directly on top of that field's own slider and hid it while you dragged. */
+.mobile-shell .field,
+.mobile-shell .detail-row { position: relative; }
+.mobile-shell .info { position: static; width: 18px; height: 18px; font-size: 10px; margin-left: 6px; }
+.mobile-shell .info .info-tip {
+  bottom: auto; top: calc(100% + 6px);
+  left: 0; right: 0; width: auto; transform: none;
+}
+.mobile-shell .info .info-tip::after { display: none; }
+
+/* ---- Cities tab ---- */
+.mobile-shell .sidebar h2 { font-size: 16px; }
+.mobile-shell .match-row { padding: 12px 8px; gap: 12px; }
+.mobile-shell .match-name { font-size: 15px; }
+.mobile-shell .match-sub { font-size: 12px; }
+.mobile-shell .chip { font-size: 11px; padding: 3px 7px; }
+.mobile-shell .match-detail .detail-row { font-size: 13px; padding: 4px 0; }
+.mobile-shell .match-detail .detail-row.compare { gap: 6px; }
+/* Three columns leave no room for the source note beside the figure — it wrapped mid-value. */
+.mobile-shell .detail-row.compare .detail-note { display: block; }
+
+/* ---- Map tab ---- */
+.mobile-shell .map-wrap { height: 100%; }
+.mobile-shell .leaflet-bar a { width: 36px; height: 36px; line-height: 36px; }
+.mobile-shell .legend {
+  width: 150px; padding: 8px 10px; font-size: 11px;
+  left: max(10px, env(safe-area-inset-left));
+  bottom: calc(10px + env(safe-area-inset-bottom));
+}
+.mobile-shell .legend-hint { display: none; }
+/* The detail card becomes a bottom sheet rather than a 300px card on a 360px screen. */
+.mobile-shell .detail-card,
+.mobile-shell .detail-card.wide {
+  top: auto; width: auto;
+  left: max(10px, env(safe-area-inset-left));
+  right: max(10px, env(safe-area-inset-right));
+  bottom: calc(10px + env(safe-area-inset-bottom));
+  max-height: 60%; overflow-y: auto; overscroll-behavior: contain;
+  padding: 14px 14px 12px;
+  /* Fully opaque: the sheet sits over the legend, which ghosted through the desktop card's
+     96% alpha at this size. */
+  background: #101621;
+}
+.mobile-shell .detail-close { width: 34px; height: 34px; top: 4px; right: 4px; }
+
+/* Very narrow phones (320px): reclaim the side gutters and trim the comparison text a touch,
+   so the three-column rows still keep "Post-tax income /mo" on one line. */
+@media (max-width: 360px) {
+  .mobile-shell .panel { --gutter: 10px; }
+  .mobile-shell .match-detail { margin-left: 4px; margin-right: 4px; }
+  .mobile-shell .match-detail .detail-row { font-size: 12px; }
+  .mobile-shell .match-detail .detail-row.compare { grid-template-columns: 1.65fr 1fr 1fr; }
+}
+.detail-card.compact { max-height: none; }
+.detail-quick {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px 14px;
+  margin: 12px 0 4px; padding-top: 10px; border-top: 1px solid var(--line);
+}
+.quick-stat { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.quick-label { font-size: 11px; color: var(--muted); }
+.quick-value { font-size: 14px; font-weight: 600; }
+/* `.btn.detail-more` (not `.detail-more`) so this outranks `.btn.ghost:hover`, which would
+   otherwise turn it danger-red — this button navigates, it doesn't destroy anything. */
+.btn.detail-more { width: 100%; margin-top: 12px; padding: 11px; font-size: 14px; }
+.btn.detail-more:hover { border-color: var(--accent); color: var(--accent); }
