@@ -46,6 +46,27 @@ export function buildTempCdf({ offsets, bytes }, count, maxRain) {
   return cdf;
 }
 
+// Same, for a single entity — used by the city detail card, which only ever looks at one city
+// and would otherwise pay for a full 1753-city rebuild.
+export function buildTempCdfOne({ offsets, bytes }, i, maxRain) {
+  const pmax = maxRain == null ? P_MAX : Math.min(P_MAX, Math.max(0, maxRain));
+  const cdf = new Uint16Array(STRIDE);
+  let pos = offsets[i];
+  const end = offsets[i + 1];
+  let bucket = 0;
+  while (pos < end) {
+    let run = 0, shift = 0, b;
+    do { b = bytes[pos++]; run |= (b & 127) << shift; shift += 7; } while (b & 128);
+    bucket += run;
+    let n = 0; shift = 0;
+    do { b = bytes[pos++]; n |= (b & 127) << shift; shift += 7; } while (b & 128);
+    if (bucket % P_BUCKETS <= pmax) cdf[((bucket / P_BUCKETS) | 0) + 1] += n;
+    bucket++;
+  }
+  for (let t = 1; t <= T_BUCKETS; t++) cdf[t] += cdf[t - 1];
+  return cdf;
+}
+
 // Days for entity i with minTemp <= tmax <= maxTemp (null = unbounded) at the cdf's maxRain.
 export function daysInRange(cdf, i, minTemp, maxTemp) {
   const lo = Math.max(0, (minTemp == null ? T_MIN : minTemp) - T_MIN);

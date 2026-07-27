@@ -1,4 +1,5 @@
 import { climateSummary, netIncomePercentOf, colPercentOf, yearsOf } from "../hooks/useMatches.js";
+import { buildTempCdfOne, daysInRange } from "../climate.js";
 import InfoIcon from "./InfoIcon.jsx";
 
 const pct = (v) => (v == null ? "—" : `${v}%`);
@@ -10,11 +11,16 @@ const numOf = (v) => (v === null || v === undefined || v === "" ? null : Number(
 
 // Days per year outside the set daytime temperature thresholds (daytime = the daily maximum).
 // Module-level so the full detail list and the map's quick preview report the same figures.
-const daysOutside = (c, limit, cmpFn) => (c && c.tmax && limit != null
-  ? Math.round(c.tmax.filter((t) => t != null && t !== -128 && cmpFn(t, limit)).length / yearsOf(c))
-  : null);
-const daysAboveOf = (c, maxT) => daysOutside(c, maxT, (t, l) => t > l);
-const daysBelowOf = (c, minT) => daysOutside(c, minT, (t, l) => t < l);
+// These ignore rainfall, so they read the histogram's unconstrained temperature marginal.
+const marginal = (c) => (c && c.packed && c.index != null ? buildTempCdfOne(c.packed, c.index, null) : null);
+const daysAboveOf = (c, maxT) => {
+  const m = maxT == null ? null : marginal(c);
+  return m ? Math.round(daysInRange(m, 0, maxT + 1, null) / yearsOf(c)) : null;
+};
+const daysBelowOf = (c, minT) => {
+  const m = minT == null ? null : marginal(c);
+  return m ? Math.round(daysInRange(m, 0, null, minT - 1) / yearsOf(c)) : null;
+};
 
 function Row({ label, a, b, hasCompare, note, noteB, info }) {
   return (
@@ -52,7 +58,7 @@ export function CityDetailBody({ city, filters = {}, currentCity }) {
   // city, but derived from the data itself rather than hardcoded so it can't go stale again).
   const WEATHER_END_YEAR = 2025;
   const climateYearLabel = (c) => {
-    if (!c || !c.tmax) return "no data";
+    if (!c || !c.days) return "no data";
     const yrs = yearsOf(c);
     return yrs > 1 ? `${WEATHER_END_YEAR - yrs + 1}–${WEATHER_END_YEAR}` : `${WEATHER_END_YEAR}`;
   };
