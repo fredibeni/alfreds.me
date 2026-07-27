@@ -77,12 +77,11 @@ body {
   border: none; border-radius: 50%;
   background: var(--line); color: var(--text);
   font-family: inherit; font-size: 9px; font-style: italic; font-weight: 700; line-height: 1;
-  cursor: help; position: relative; vertical-align: middle; outline: none;
+  cursor: pointer; position: relative; vertical-align: middle; outline: none;
 }
-/* display:none (not just visibility) so the hidden tooltip adds no scrollable
-   width to the sidebar, which otherwise gets a stray horizontal scrollbar. */
+/* Only in the DOM while its button is toggled open (InfoIcon renders it conditionally), so a
+   closed tooltip contributes no layout — it used to add stray scrollable width to the sidebar. */
 .info .info-tip {
-  display: none;
   position: absolute; bottom: calc(100% + 7px); left: 50%; transform: translateX(-50%);
   width: 190px; z-index: 800;
   background: #0b1420; border: 1px solid var(--line); border-radius: 8px;
@@ -94,12 +93,7 @@ body {
   content: ""; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
   border: 5px solid transparent; border-top-color: var(--line);
 }
-.info:focus .info-tip { display: block; }
-/* Touch devices emulate :hover and then latch it until you tap elsewhere, which left the tip
-   stuck open over the control below. There, opening it is a deliberate tap (:focus) only. */
-@media (hover: hover) {
-  .info:hover .info-tip { display: block; }
-}
+.info:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
 
 /* In the detail card (top of the map) show the tooltip below the icon to avoid clipping. */
 .detail-card .info .info-tip { bottom: auto; top: calc(100% + 7px); }
