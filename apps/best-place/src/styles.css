@@ -59,7 +59,9 @@ body {
 .field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; }
 .field-label { font-size: 13px; color: var(--text); }
 .field-hint { font-size: 11px; color: var(--muted); }
-.field input, .field select {
+/* Text/select styling only — a range input styles its own track and thumb below, and any
+   padding here would inset the thumb's travel from the ends of that track. */
+.field input:not([type="range"]), .field select {
   background: var(--panel-2);
   border: 1px solid var(--line);
   color: var(--text);
@@ -68,7 +70,7 @@ body {
   font-size: 14px;
   outline: none;
 }
-.field input:focus, .field select:focus { border-color: var(--accent-2); }
+.field input:not([type="range"]):focus, .field select:focus { border-color: var(--accent-2); }
 
 /* ---- Info icon + hover tooltip ---- */
 .info {
@@ -107,7 +109,7 @@ body {
 input[type="range"] {
   -webkit-appearance: none; appearance: none;
   width: 100%; height: 4px; padding: 0; margin: 4px 0 2px;
-  background: var(--line); border-radius: 3px; border: none; outline: none; cursor: pointer;
+  background: var(--line); border-radius: 999px; border: none; outline: none; cursor: pointer;
 }
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none; appearance: none;
@@ -407,7 +409,7 @@ button.continent-toggle { cursor: pointer; }
 .mobile-shell .field { margin-bottom: 18px; }
 .mobile-shell .field-label { font-size: 14px; }
 /* 16px keeps iOS Safari from zooming the viewport when a field takes focus. */
-.mobile-shell .field input, .mobile-shell .field select { font-size: 16px; padding: 10px 12px; }
+.mobile-shell .field input:not([type="range"]), .mobile-shell .field select { font-size: 16px; padding: 10px 12px; }
 .mobile-shell input[type="range"] { height: 6px; margin: 12px 0 4px; }
 .mobile-shell input[type="range"]::-webkit-slider-thumb { width: 26px; height: 26px; border-width: 3px; }
 .mobile-shell input[type="range"]::-moz-range-thumb { width: 22px; height: 22px; border-width: 3px; }

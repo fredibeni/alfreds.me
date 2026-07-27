@@ -99,9 +99,9 @@ export default function Sidebar({
   selectedContinents, setSelectedContinents, onHoverCity, selectedCountry, onClearCountry,
   expandable = false, filters, currentCity, visible = true, showCount = true, onShowOnMap,
 }) {
+  // A tax chip appears only when you've actually filtered on that tax.
   const showIT = taxFilters.maxIncomeTax != null;
   const showCGT = taxFilters.maxCapGainsTax != null;
-  const showDefaultTax = !showIT && !showCGT; // with no tax filter, show income tax as default
   const shown = matches.slice(0, SIDEBAR_LIMIT);
 
   // Reveal the expanded row when the selection came from elsewhere — tapping a pin on the Map
@@ -181,7 +181,7 @@ export default function Sidebar({
                     <span className="chip income">{Math.round(c.netIncomePercent)}% inc</span>
                   )}
                   {c.colPercent != null && <span className="chip col">{Math.round(c.colPercent)}% CoL</span>}
-                  {(showIT || showDefaultTax) && c.incomeTax != null && (
+                  {showIT && c.incomeTax != null && (
                     <span className="chip tax">{c.incomeTax}% IT</span>
                   )}
                   {showCGT && c.capitalGainsTax != null && (
