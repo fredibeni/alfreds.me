@@ -1,16 +1,9 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { EMPTY_FILTERS } from "../hooks/useMatches.js";
+import InfoIcon from "./InfoIcon.jsx";
+import { BackHome, TITLE, TAGLINE } from "./AppHeader.jsx";
 
 const MIN_POP = 300000;
-
-// Small "i" icon that reveals explanatory text on hover.
-function InfoIcon({ text }) {
-  return (
-    <span className="info" tabIndex={0} role="img" aria-label={text}>
-      i<span className="info-tip">{text}</span>
-    </span>
-  );
-}
 
 // A slider that supports an "Any" (unset) state at its non-constraining extreme.
 // `anyAt` is the slider value that means "no constraint" -> stored as null.
@@ -40,13 +33,29 @@ function Slider({ label, hint, info, min, max, step, anyAt, value, onChange, for
 }
 
 // Free-text city picker with type-ahead suggestions.
-function CityAutocomplete({ cities, valueId, onChange }) {
+// `focusRequest` is a counter the Cities tab bumps via its "Add your city" link; each new
+// value pulls focus here. A counter rather than a boolean so repeat clicks re-trigger it.
+function CityAutocomplete({ cities, valueId, onChange, focusRequest = 0 }) {
   const selected = valueId ? cities.find((c) => c.id === valueId) : null;
   const [text, setText] = useState("");
   const [focused, setFocused] = useState(false);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(0);
   const blurTimer = useRef(null);
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    if (!focusRequest || !inputRef.current) return;
+    inputRef.current.focus();
+    inputRef.current.scrollIntoView({ block: "center", behavior: "smooth" });
+  }, [focusRequest]);
+
+  // Clearing the filters from outside has to wipe the typed text too. onFocus would normally
+  // resync it, but it never fires when the box already holds focus — leaving the field showing
+  // a city that is no longer selected.
+  useEffect(() => {
+    if (!valueId) setText("");
+  }, [valueId]);
 
   // Show the selected city's label unless the user is actively typing.
   const shownText = focused ? text : selected ? `${selected.name}, ${selected.country}` : "";
@@ -80,6 +89,7 @@ function CityAutocomplete({ cities, valueId, onChange }) {
   return (
     <div className="autocomplete">
       <input
+        ref={inputRef}
         type="text"
         placeholder="Type a city…"
         value={shownText}
@@ -123,7 +133,10 @@ const tempFmt = (v) => `${v}°C`;
 const rainFmt = (v) => `${v} mm`;
 const popFmt = (v) => (v >= 1e6 ? `${(v / 1e6).toFixed(1)}M` : `${Math.round(v / 1e3)}k`);
 
-export default function FilterPanel({ draft, setDraft, onApply, onClear, cities, dirty }) {
+// `showHeader` is false on mobile, where the back link / title / tagline live in the shell
+// above the tabs instead. `mobile` keeps the primary action tappable even when nothing has
+// changed, since on mobile it doubles as "take me to the results tab".
+export default function FilterPanel({ draft, setDraft, onApply, onClear, cities, dirty, showHeader = true, mobile = false, focusCityRequest = 0 }) {
   const set = (k) => (v) => setDraft((d) => ({ ...d, [k]: v }));
 
   const needsCity =
@@ -131,11 +144,15 @@ export default function FilterPanel({ draft, setDraft, onApply, onClear, cities,
 
   return (
     <aside className="panel filters">
-      <a className="back-home" href="/">
-        <span aria-hidden="true">&#8592;</span> Back to Home
-      </a>
-      <h1>Best Place</h1>
-      <p className="tagline">Find where to live. All filters are optional.</p>
+      {showHeader && (
+        <div className="panel-head">
+          <BackHome />
+          <div className="panel-title">
+            <h1>{TITLE}</h1>
+            <p className="tagline">{TAGLINE}</p>
+          </div>
+        </div>
+      )}
 
       <section>
         <h2>Taxes</h2>
@@ -154,10 +171,11 @@ export default function FilterPanel({ draft, setDraft, onApply, onClear, cities,
             cities={cities || []}
             valueId={draft.currentCityId}
             onChange={set("currentCityId")}
+            focusRequest={focusCityRequest}
           />
         </label>
         {needsCity && (
-          <p className="field-error">Select your current city to use the cost-of-living and income filters.</p>
+          <p className="field-error">Select your current city</p>
         )}
         <Slider label="Max cost of living (% of current)" min={10} max={200} step={5} anyAt={200}
           value={draft.maxColPercent} onChange={set("maxColPercent")} format={pctFmt} />
@@ -186,8 +204,10 @@ export default function FilterPanel({ draft, setDraft, onApply, onClear, cities,
       </section>
 
       <div className="actions">
-        <button className="btn primary" onClick={onApply} disabled={!dirty}>
-          {dirty ? "Apply filters" : "Applied"}
+        {/* Mobile keeps one stable label: the button always applies whatever is set and moves
+            you to the results, so relabelling it per dirty-state was just noise. */}
+        <button className="btn primary" onClick={onApply} disabled={!mobile && !dirty}>
+          {mobile ? "See cities" : dirty ? "Apply filters" : "Applied"}
         </button>
         <button className="btn ghost" onClick={onClear}>Clear</button>
       </div>

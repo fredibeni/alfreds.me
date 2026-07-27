@@ -297,6 +297,20 @@ function ResetViewControl() {
   return null;
 }
 
+// On mobile the map lives in a tab panel that is display:none while another tab is showing,
+// so Leaflet measures a 0x0 container. Re-measure once the panel is visible again (the
+// resulting `resize` event is also what makes the climate-grid canvas repaint at the right
+// size). rAF so the browser has actually laid the panel out before we measure.
+function InvalidateOnShow({ active }) {
+  const map = useMap();
+  useEffect(() => {
+    if (!active) return undefined;
+    const id = requestAnimationFrame(() => map.invalidateSize({ animate: false }));
+    return () => cancelAnimationFrame(id);
+  }, [active, map]);
+  return null;
+}
+
 function FlyTo({ city }) {
   const map = useMap();
   useEffect(() => {
@@ -323,6 +337,7 @@ export default function MapView({
   hoveredCityId,
   selectedCountry,
   onSelectCountry,
+  active = true,
 }) {
   const [hoveredCkey, setHoveredCkey] = useState(null);
   // A one-shot id (not just a boolean) so repeated clicks on ineligible countries each
@@ -406,6 +421,7 @@ export default function MapView({
         style={{ height: "100%", width: "100%", background: WATER }}
       >
         <ResetViewControl />
+        <InvalidateOnShow active={active} />
         <MapLayers
           geojson={geojson}
           grid={grid}
