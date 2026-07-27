@@ -7,6 +7,7 @@ import Sidebar from "./components/Sidebar.jsx";
 import CityDetail from "./components/CityDetail.jsx";
 import { BackHome, TITLE, TAGLINE } from "./components/AppHeader.jsx";
 import { EMPTY_FILTERS, useMatches } from "./hooks/useMatches.js";
+import { readPacked } from "./climate.js";
 import useIsMobile from "./hooks/useIsMobile.js";
 import { CONTINENTS } from "./continents.js";
 
@@ -75,9 +76,12 @@ export default function App() {
     if (!mapNeeded || mapAssetsRequested.current) return;
     mapAssetsRequested.current = true;
     fetch(`${import.meta.env.BASE_URL}world.geojson`).then((r) => r.json()).then(setGeojson).catch(() => {});
-    fetch(`${import.meta.env.BASE_URL}grid.json`)
-      .then((r) => r.json())
-      .then((g) => setGrid({ ...g, tmax: decodeI8(g.tmax), precip: decodeI8(g.precip) }))
+    // Climate grid: a small metadata JSON plus the packed histograms (see src/climate.js).
+    Promise.all([
+      fetch(`${import.meta.env.BASE_URL}grid-meta.json`).then((r) => r.json()),
+      fetch(`${import.meta.env.BASE_URL}grid-clim.bin`).then((r) => r.arrayBuffer()),
+    ])
+      .then(([meta, buf]) => setGrid({ ...meta, packed: readPacked(buf, meta.cells.length) }))
       .catch(() => {});
   }, [mapNeeded]);
 
