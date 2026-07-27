@@ -48,6 +48,8 @@ export default function App() {
   const [selectedContinents, setSelectedContinents] = useState(() => new Set(CONTINENTS));
   const [selectedCountry, setSelectedCountry] = useState(null); // { ckey, name } | null
   const [tab, setTab] = useState("filters");
+  // Bumped by the Cities tab's "Add your city" link; FilterPanel focuses its city box on change.
+  const [focusCityRequest, setFocusCityRequest] = useState(0);
 
   // The map's two heavy assets (grid.json ~17 MB, world.geojson ~3 MB) are only ever used by
   // MapView, so on mobile they wait until the Map tab is first opened. That keeps the initial
@@ -144,6 +146,7 @@ export default function App() {
       dirty={dirty}
       showHeader={!isMobile}
       mobile={isMobile}
+      focusCityRequest={focusCityRequest}
     />
   );
 
@@ -167,6 +170,12 @@ export default function App() {
       visible={!isMobile || tab === "cities"}
       showCount={!isMobile}
       onShowOnMap={(c) => { setSelectedCity(c); setTab("map"); }}
+      onAddCity={() => {
+        // On mobile the city box lives on another tab; both updates batch into one render, so
+        // the panel is already visible by the time FilterPanel's focus effect runs.
+        if (isMobile) setTab("filters");
+        setFocusCityRequest((n) => n + 1);
+      }}
     />
   );
 

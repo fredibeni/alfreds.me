@@ -229,6 +229,15 @@ button.continent-toggle { cursor: pointer; }
 .pill:hover { border-color: var(--accent-2); color: var(--text); }
 .pill.active { background: rgba(255,180,0,.14); color: var(--accent); border-color: var(--accent); }
 
+/* Prompt under the continents block, jumping to the city box in the filters. */
+.add-city-link {
+  display: block; margin: -2px 0 12px; padding: 0;
+  background: none; border: none;
+  font: inherit; font-size: 12.5px; font-style: italic;
+  color: var(--accent-2); text-align: left; cursor: pointer;
+}
+.add-city-link:hover { text-decoration: underline; }
+
 .match-list { list-style: none; margin: 0; padding: 0; }
 .match { border-radius: 9px; border: 1px solid transparent; }
 .match-row {
@@ -415,6 +424,7 @@ button.continent-toggle { cursor: pointer; }
 .mobile-shell input[type="range"]::-moz-range-thumb { width: 22px; height: 22px; border-width: 3px; }
 .mobile-shell .suggestions li { padding: 11px 10px; font-size: 14px; }
 .mobile-shell .pill { font-size: 12.5px; padding: 7px 11px; }
+.mobile-shell .add-city-link { font-size: 13px; padding: 6px 0; margin: -4px 0 8px; }
 .mobile-shell .continent-toggle { min-height: 40px; }
 .mobile-shell .continent-caret { width: 16px; height: 16px; }
 .mobile-shell .link-btn { font-size: 12.5px; padding: 4px 0; }

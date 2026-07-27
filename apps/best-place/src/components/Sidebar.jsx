@@ -97,7 +97,7 @@ function ContinentFilter({ selectedContinents, setSelectedContinents, collapsibl
 export default function Sidebar({
   matches, climate, taxFilters, incomeActive, selectedCity, onSelect, totalCount,
   selectedContinents, setSelectedContinents, onHoverCity, selectedCountry, onClearCountry,
-  expandable = false, filters, currentCity, visible = true, showCount = true, onShowOnMap,
+  expandable = false, filters, currentCity, visible = true, showCount = true, onShowOnMap, onAddCity,
 }) {
   // A tax chip appears only when you've actually filtered on that tax.
   const showIT = taxFilters.maxIncomeTax != null;
@@ -144,6 +144,14 @@ export default function Sidebar({
         setSelectedContinents={setSelectedContinents}
         collapsible={expandable}
       />
+
+      {/* Only while there's nothing to compare against — once a city is set, the comparison
+          columns are already there and the prompt would be stale. */}
+      {onAddCity && !currentCity && (
+        <button type="button" className="add-city-link" onClick={onAddCity}>
+          Add your city for a comparison
+        </button>
+      )}
 
       {matches.length === 0 && (
         <p className="empty">No cities match the current filters. Loosen a filter and Apply.</p>
