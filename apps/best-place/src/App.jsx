@@ -235,7 +235,7 @@ export default function App() {
       <>
         <div className="mobile-shell">
           <header className="mobile-head">
-            <BackHome short />
+            <BackHome />
             <div className="mobile-title">
               <h1>{TITLE}</h1>
               <p className="tagline">{TAGLINE}</p>

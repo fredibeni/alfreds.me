@@ -50,8 +50,12 @@ body {
   transition: color .15s ease, border-color .15s ease, background .15s ease;
 }
 .back-home:hover { color: var(--text); border-color: var(--accent-2); background: rgba(58,160,255,.12); }
-.filters h1 { margin: 4px 0 2px; font-size: 22px; letter-spacing: .3px; }
-.filters .tagline { margin: 0 0 16px; color: var(--muted); font-size: 13px; }
+/* Back link beside the title block, matching the mobile header. */
+.panel-head { display: flex; align-items: center; gap: 10px; margin: 0 0 16px; }
+.panel-head .back-home { flex: none; margin: 0; white-space: nowrap; }
+.panel-title { min-width: 0; }
+.filters h1 { margin: 0; font-size: 22px; letter-spacing: .3px; }
+.filters .tagline { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
 .filters section { border-top: 1px solid var(--line); padding: 14px 0 6px; }
 .filters h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .8px; color: var(--accent-2); margin: 0 0 10px; }
 .section-note { color: var(--muted); font-size: 12px; margin: -4px 0 10px; }
@@ -229,9 +233,13 @@ button.continent-toggle { cursor: pointer; }
 .pill:hover { border-color: var(--accent-2); color: var(--text); }
 .pill.active { background: rgba(255,180,0,.14); color: var(--accent); border-color: var(--accent); }
 
-/* Prompt under the continents block, jumping to the city box in the filters. */
+/* Prompt under the continents block, jumping to the city box in the filters.
+   The left padding lines its text up with the rank digits below it: the rank column's right
+   edge is (row padding + rank width) in from the li, and a single digit sits against that edge,
+   so backing off 1ch lands on the digit's left side. */
 .add-city-link {
-  display: block; margin: -2px 0 12px; padding: 0;
+  display: block; margin: -2px 0 12px;
+  padding: 0 0 0 calc(9px + 20px - 1ch);
   background: none; border: none;
   font: inherit; font-size: 12.5px; font-style: italic;
   color: var(--accent-2); text-align: left; cursor: pointer;
@@ -424,7 +432,10 @@ button.continent-toggle { cursor: pointer; }
 .mobile-shell input[type="range"]::-moz-range-thumb { width: 22px; height: 22px; border-width: 3px; }
 .mobile-shell .suggestions li { padding: 11px 10px; font-size: 14px; }
 .mobile-shell .pill { font-size: 12.5px; padding: 7px 11px; }
-.mobile-shell .add-city-link { font-size: 13px; padding: 6px 0; margin: -4px 0 8px; }
+.mobile-shell .add-city-link {
+  font-size: 13px; margin: -4px 0 8px;
+  padding: 6px 0 6px calc(9px + 20px - 1ch);
+}
 .mobile-shell .continent-toggle { min-height: 40px; }
 .mobile-shell .continent-caret { width: 16px; height: 16px; }
 .mobile-shell .link-btn { font-size: 12.5px; padding: 4px 0; }

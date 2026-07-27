@@ -149,7 +149,7 @@ export default function Sidebar({
           columns are already there and the prompt would be stale. */}
       {onAddCity && !currentCity && (
         <button type="button" className="add-city-link" onClick={onAddCity}>
-          Add your city for a comparison
+          Add your city for a comparison <span aria-hidden="true">&#8594;</span>
         </button>
       )}
 

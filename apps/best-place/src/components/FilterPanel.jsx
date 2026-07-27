@@ -145,11 +145,13 @@ export default function FilterPanel({ draft, setDraft, onApply, onClear, cities,
   return (
     <aside className="panel filters">
       {showHeader && (
-        <>
+        <div className="panel-head">
           <BackHome />
-          <h1>{TITLE}</h1>
-          <p className="tagline">{TAGLINE}</p>
-        </>
+          <div className="panel-title">
+            <h1>{TITLE}</h1>
+            <p className="tagline">{TAGLINE}</p>
+          </div>
+        </div>
       )}
 
       <section>
