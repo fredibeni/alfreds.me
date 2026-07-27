@@ -167,11 +167,21 @@ function GridHeatLayer({
 
     const draw = () => {
       const size = map.getSize();
-      canvas.width = size.x;
-      canvas.height = size.y;
+      // Back the canvas at device resolution. Sized in CSS pixels it was upscaled by the
+      // browser — on a 3x phone the heatmap rendered at a third of the screen's resolution
+      // (visibly soft) and every one-pixel seam between cells became a three-pixel dark line.
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = Math.round(size.x * dpr);
+      canvas.height = Math.round(size.y * dpr);
+      canvas.style.width = `${size.x}px`;
+      canvas.style.height = `${size.y}px`;
       L.DomUtil.setPosition(canvas, map.containerPointToLayerPoint([0, 0]));
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0); // keep drawing in CSS pixels
       ctx.clearRect(0, 0, size.x, size.y);
       const W = size.x, H = size.y;
+      // Snap a CSS-pixel coordinate onto the device-pixel grid, so neighbouring fills share an
+      // exact edge: no gap for the land base to show through, and no double-drawn seam.
+      const snap = (v) => Math.round(v * dpr) / dpr;
 
       // Re-rank against the cells NEAR the current view so the full colour range always maps to
       // the variation actually on screen (see the rankOf comment above). The window starts at
@@ -237,16 +247,21 @@ function GridHeatLayer({
         const sw = cw / SUB, sh = ch / SUB;
         for (let sy = 0; sy < SUB; sy++) {
           const fy = (sy + 0.5) / SUB; // 0 south, 1 north
+          // screen y increases downward while fy increases northward -> north is smaller y
+          const yA = snap(y0 + (SUB - 1 - sy) * sh);
+          const yB = snap(y0 + (SUB - sy) * sh);
           for (let sx = 0; sx < SUB; sx++) {
             const fx = (sx + 0.5) / SUB; // 0 west, 1 east
             const top = v00 + (vE - v00) * fx;      // south edge
             const bot = vN + (vNE - vN) * fx;       // north edge
             const v = top + (bot - top) * fy;
             ctx.fillStyle = heatColor(v);
-            // screen y increases downward while fy increases northward -> north is smaller y
-            const rx = x0 + sx * sw;
-            const ry = y0 + (SUB - 1 - sy) * sh;
-            ctx.fillRect(rx, ry, sw + 1, sh + 1);
+            // Both edges are snapped to the device-pixel grid, so this rect ends exactly where
+            // its neighbour begins — including across cell boundaries, since adjacent cells
+            // project to the same shared edge before snapping.
+            const xA = snap(x0 + sx * sw);
+            const xB = snap(x0 + (sx + 1) * sw);
+            ctx.fillRect(xA, yA, xB - xA, yB - yA);
           }
         }
       }
