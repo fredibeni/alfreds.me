@@ -481,7 +481,7 @@ function MapLayers({
   const map = useMap();
   const [ready, setReady] = useState(false);
   const markerRefs = useRef(new Map());
-  const countryLayerRefs = useRef(new Map());
+  const countryLayerRef = useRef(null); // the whole country group, for draw-order control
   // Track the one pin tooltip that should be open. In a dense cluster of overlapping pins,
   // fast mouse movement can make the browser skip a mouseout (the element never actually
   // moves out from under the cursor, it just gets covered/uncovered by a neighbour), which
@@ -543,13 +543,24 @@ function MapLayers({
     };
   }, [map]);
 
-  // Pop the hovered/selected country's border above its neighbours.
+  // Countries and city pins share one canvas renderer, and there draw order IS hit-test order:
+  // Leaflet walks the draw chain and keeps the LAST layer containing the point. So the country
+  // polygons have to stay behind the pins, or a pin's own country answers the hover and click
+  // instead of the pin.
+  //
+  // Two things used to break that. Countries were promoted with bringToFront() on hover and on
+  // selection, which parks them above every pin — that is why hovering a pin showed the country
+  // name. And the layers can mount in either order: cities.json is far smaller than the world
+  // outline, so the pins usually exist before the country layer is added, leaving countries last
+  // by default. Sending the country group to the back once it mounts fixes both, in one call per
+  // country rather than one per pin.
+  //
+  // The cost is that a hovered country's border is no longer lifted above its neighbours'. Its
+  // highlight is still drawn from styleFn (white, 2.5px against 0.6px), so only shared edges can
+  // be partly overdrawn.
   useEffect(() => {
-    if (hoveredCkey) countryLayerRefs.current.get(hoveredCkey)?.bringToFront();
-  }, [hoveredCkey]);
-  useEffect(() => {
-    if (selectedCountry) countryLayerRefs.current.get(selectedCountry.ckey)?.bringToFront();
-  }, [selectedCountry]);
+    countryLayerRef.current?.bringToBack();
+  }, [geojson]);
 
   // If the selected country stops being eligible (tax/continent filters changed under it),
   // drop the country filter rather than leave the sidebar silently stuck on it.
@@ -594,11 +605,11 @@ function MapLayers({
       {geojson && (
         <GeoJSON
           key="countries"
+          ref={countryLayerRef}
           data={geojson}
           style={styleFn}
           onEachFeature={(feature, layer) => {
             const p = feature.properties;
-            countryLayerRefs.current.set(p.ckey, layer);
             const inc = p.incomeTax == null ? "n/a" : `${p.incomeTax}%`;
             const cg = p.capitalGainsTax == null ? "n/a" : `${p.capitalGainsTax}%`;
             layer.bindTooltip(`${p.name} — income ${inc}, cap. gains ${cg}`, { sticky: true });
