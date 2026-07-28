@@ -167,10 +167,14 @@ function GridHeatLayer({
 
     const draw = () => {
       const size = map.getSize();
-      // Back the canvas at device resolution. Sized in CSS pixels it was upscaled by the
-      // browser — on a 3x phone the heatmap rendered at a third of the screen's resolution
-      // (visibly soft) and every one-pixel seam between cells became a three-pixel dark line.
-      const dpr = window.devicePixelRatio || 1;
+      // Back the canvas above CSS resolution, but capped. Sized at 1x it was upscaled by the
+      // browser, and upscaling interpolates alpha as well as colour, so every one-pixel seam
+      // became a three-pixel dark line on a 3x phone. Going to the full ratio fixed that but
+      // squares the fill cost — 9x the work per redraw on the same phone, on every pan and
+      // zoom. Two is the sweet spot: still twice the density that produced the artifact, at
+      // less than half the pixels of a full 3x buffer. The layer is a soft 72%-opacity
+      // gradient, so the last of the sharpness is not worth the frame time.
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
       canvas.width = Math.round(size.x * dpr);
       canvas.height = Math.round(size.y * dpr);
       canvas.style.width = `${size.x}px`;
@@ -219,7 +223,10 @@ function GridHeatLayer({
       const cellPx = Math.abs(
         map.latLngToContainerPoint([0, res]).x - map.latLngToContainerPoint([0, 0]).x
       );
-      const SUB = Math.max(2, Math.min(24, Math.ceil(cellPx / 4)));
+      // Sub-squares every ~8 CSS px rather than ~4, capped at 12 a side rather than 24. That is
+      // up to 144 fills per cell instead of 576 — a 4x cut in draw calls for a gradient that is
+      // interpolated and then shown at 72% opacity, where the extra sampling is not visible.
+      const SUB = Math.max(2, Math.min(12, Math.ceil(cellPx / 8)));
 
       ctx.save();
       clipToLand(south, north, west, east); // confine fills to on-screen land
