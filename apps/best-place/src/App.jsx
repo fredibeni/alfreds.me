@@ -45,9 +45,29 @@ export default function App() {
   // Bumped by the Cities tab's "Add your city" link; FilterPanel focuses its city box on change.
   const [focusCityRequest, setFocusCityRequest] = useState(0);
 
-  // The map's assets are only ever used by MapView, so on mobile they wait until the Map tab is
-  // first opened — the Filters and Cities tabs are then usable off the city data alone.
-  const mapNeeded = !isMobile || tab === "map";
+  // Two separate questions, deliberately not the same flag.
+  //
+  // Whether to MOUNT the map: on mobile, not until the Map tab is opened, so Leaflet's setup
+  // never competes with the city list for the main thread.
+  const mapVisible = !isMobile || tab === "map";
+  // Whether to FETCH its assets: as soon as the browser is idle after the city data lands.
+  // Waiting for the tab meant the ~1.7 MB grid download only started on the tap, so the
+  // heatmap took about five seconds to appear. Prefetching moves that off the critical path
+  // without delaying first paint — the request is issued during idle time, after the list is
+  // already interactive.
+  const [prefetchMap, setPrefetchMap] = useState(false);
+  useEffect(() => {
+    if (!data || prefetchMap) return undefined;
+    const idle = window.requestIdleCallback;
+    if (!idle) {
+      const t = setTimeout(() => setPrefetchMap(true), 1000);
+      return () => clearTimeout(t);
+    }
+    const id = idle(() => setPrefetchMap(true), { timeout: 2500 });
+    return () => window.cancelIdleCallback(id);
+  }, [data, prefetchMap]);
+
+  const mapNeeded = mapVisible || prefetchMap;
 
   useEffect(() => {
     // City metadata plus the packed per-city climate histograms (see src/climate.js). Each city
@@ -83,8 +103,8 @@ export default function App() {
   // — and so the user's pan/zoom survives tab switches.
   const [mapMounted, setMapMounted] = useState(!isMobile);
   useEffect(() => {
-    if (mapNeeded) setMapMounted(true);
-  }, [mapNeeded]);
+    if (mapVisible) setMapMounted(true); // mapVisible, not mapNeeded — prefetching must not mount
+  }, [mapVisible]);
 
   const cities = data?.cities;
   const { rows, matches: allMatches, currentCity, climate } = useMatches(cities, applied, cityClimate);
