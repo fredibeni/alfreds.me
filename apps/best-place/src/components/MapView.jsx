@@ -167,11 +167,21 @@ function GridHeatLayer({
 
     const draw = () => {
       const size = map.getSize();
-      canvas.width = size.x;
-      canvas.height = size.y;
+      // Back the canvas at device resolution. Sized in CSS pixels it was upscaled by the
+      // browser — on a 3x phone the heatmap rendered at a third of the screen's resolution
+      // (visibly soft) and every one-pixel seam between cells became a three-pixel dark line.
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = Math.round(size.x * dpr);
+      canvas.height = Math.round(size.y * dpr);
+      canvas.style.width = `${size.x}px`;
+      canvas.style.height = `${size.y}px`;
       L.DomUtil.setPosition(canvas, map.containerPointToLayerPoint([0, 0]));
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0); // keep drawing in CSS pixels
       ctx.clearRect(0, 0, size.x, size.y);
       const W = size.x, H = size.y;
+      // Snap a CSS-pixel coordinate onto the device-pixel grid, so neighbouring fills share an
+      // exact edge: no gap for the land base to show through, and no double-drawn seam.
+      const snap = (v) => Math.round(v * dpr) / dpr;
 
       // Re-rank against the cells NEAR the current view so the full colour range always maps to
       // the variation actually on screen (see the rankOf comment above). The window starts at
@@ -237,16 +247,21 @@ function GridHeatLayer({
         const sw = cw / SUB, sh = ch / SUB;
         for (let sy = 0; sy < SUB; sy++) {
           const fy = (sy + 0.5) / SUB; // 0 south, 1 north
+          // screen y increases downward while fy increases northward -> north is smaller y
+          const yA = snap(y0 + (SUB - 1 - sy) * sh);
+          const yB = snap(y0 + (SUB - sy) * sh);
           for (let sx = 0; sx < SUB; sx++) {
             const fx = (sx + 0.5) / SUB; // 0 west, 1 east
             const top = v00 + (vE - v00) * fx;      // south edge
             const bot = vN + (vNE - vN) * fx;       // north edge
             const v = top + (bot - top) * fy;
             ctx.fillStyle = heatColor(v);
-            // screen y increases downward while fy increases northward -> north is smaller y
-            const rx = x0 + sx * sw;
-            const ry = y0 + (SUB - 1 - sy) * sh;
-            ctx.fillRect(rx, ry, sw + 1, sh + 1);
+            // Both edges are snapped to the device-pixel grid, so this rect ends exactly where
+            // its neighbour begins — including across cell boundaries, since adjacent cells
+            // project to the same shared edge before snapping.
+            const xA = snap(x0 + sx * sw);
+            const xB = snap(x0 + (sx + 1) * sw);
+            ctx.fillRect(xA, yA, xB - xA, yB - yA);
           }
         }
       }
@@ -412,6 +427,11 @@ export default function MapView({
         zoom={DEFAULT_ZOOM}
         minZoom={2}
         worldCopyJump
+        /* Draw vectors into a canvas rather than as SVG nodes. The 1753 city markers plus 258
+           country polygons are 2271 SVG elements that Leaflet re-projects and rewrites on every
+           pan and zoom; that cost a measured 743 ms per zoom, and Safari — including every iOS
+           browser — is far slower at it than Chrome, which is why the map dragged worst there. */
+        preferCanvas
         zoomAnimation={false} /* the heatmap is a custom canvas that can't transform in perfect
                                  lockstep with the SVG borders mid-animation (it visibly lagged);
                                  with animation off, borders + heatmap re-render together in one
@@ -461,7 +481,7 @@ function MapLayers({
   const map = useMap();
   const [ready, setReady] = useState(false);
   const markerRefs = useRef(new Map());
-  const countryLayerRefs = useRef(new Map());
+  const countryLayerRef = useRef(null); // the whole country group, for draw-order control
   // Track the one pin tooltip that should be open. In a dense cluster of overlapping pins,
   // fast mouse movement can make the browser skip a mouseout (the element never actually
   // moves out from under the cursor, it just gets covered/uncovered by a neighbour), which
@@ -507,8 +527,12 @@ function MapLayers({
     const onMapMouseMove = (e) => {
       if (!openTooltipRef.current) return;
       const el = openTooltipRef.current.getElement?.();
+      // Canvas-rendered layers have no element of their own. There Leaflet hit-tests the
+      // pointer itself on every mousemove and fires a reliable mouseout, so this net is not
+      // needed — and without the guard it would close every tooltip the instant it opened.
+      if (!el) return;
       const under = document.elementFromPoint(e.originalEvent.clientX, e.originalEvent.clientY);
-      if (el && under === el) return;
+      if (under === el) return;
       close();
     };
     map.on("mousemove", onMapMouseMove);
@@ -519,13 +543,24 @@ function MapLayers({
     };
   }, [map]);
 
-  // Pop the hovered/selected country's border above its neighbours.
+  // Countries and city pins share one canvas renderer, and there draw order IS hit-test order:
+  // Leaflet walks the draw chain and keeps the LAST layer containing the point. So the country
+  // polygons have to stay behind the pins, or a pin's own country answers the hover and click
+  // instead of the pin.
+  //
+  // Two things used to break that. Countries were promoted with bringToFront() on hover and on
+  // selection, which parks them above every pin — that is why hovering a pin showed the country
+  // name. And the layers can mount in either order: cities.json is far smaller than the world
+  // outline, so the pins usually exist before the country layer is added, leaving countries last
+  // by default. Sending the country group to the back once it mounts fixes both, in one call per
+  // country rather than one per pin.
+  //
+  // The cost is that a hovered country's border is no longer lifted above its neighbours'. Its
+  // highlight is still drawn from styleFn (white, 2.5px against 0.6px), so only shared edges can
+  // be partly overdrawn.
   useEffect(() => {
-    if (hoveredCkey) countryLayerRefs.current.get(hoveredCkey)?.bringToFront();
-  }, [hoveredCkey]);
-  useEffect(() => {
-    if (selectedCountry) countryLayerRefs.current.get(selectedCountry.ckey)?.bringToFront();
-  }, [selectedCountry]);
+    countryLayerRef.current?.bringToBack();
+  }, [geojson]);
 
   // If the selected country stops being eligible (tax/continent filters changed under it),
   // drop the country filter rather than leave the sidebar silently stuck on it.
@@ -570,11 +605,11 @@ function MapLayers({
       {geojson && (
         <GeoJSON
           key="countries"
+          ref={countryLayerRef}
           data={geojson}
           style={styleFn}
           onEachFeature={(feature, layer) => {
             const p = feature.properties;
-            countryLayerRefs.current.set(p.ckey, layer);
             const inc = p.incomeTax == null ? "n/a" : `${p.incomeTax}%`;
             const cg = p.capitalGainsTax == null ? "n/a" : `${p.capitalGainsTax}%`;
             layer.bindTooltip(`${p.name} — income ${inc}, cap. gains ${cg}`, { sticky: true });
@@ -626,7 +661,11 @@ function MapLayers({
             }}
             center={[c.lat, c.lon]}
             radius={selected ? 9 : hovered ? 8 : 5}
-            pane="markerPane"
+            /* Deliberately NOT pane="markerPane". Under the canvas renderer each pane gets its
+               own canvas, and a marker canvas sitting above the country canvas would receive
+               every mouse event and stop countries being hoverable or clickable. Sharing the
+               default overlay pane puts markers and countries in one renderer, which hit-tests
+               them together; markers still draw on top because they are added later. */
             pathOptions={{
               color: selected || hovered ? "#3aa0ff" : "#ffffff",
               weight: selected || hovered ? 2 : 1,
