@@ -275,10 +275,21 @@ function GridHeatLayer({
       ctx.restore();
     };
 
+    // Redraw on the next frame rather than inside the event handler. Drawing synchronously meant
+    // a pan's moveend blocked whatever the user did next — pan, then immediately pinch, and the
+    // zoom waited on a full repaint before it was even handled. Coalescing also collapses a
+    // burst of events (moveend + zoomend + viewreset arrive together) into a single repaint.
+    let rafId = null;
+    const scheduleDraw = () => {
+      if (rafId !== null) return;
+      rafId = requestAnimationFrame(() => { rafId = null; draw(); });
+    };
+
     draw();
-    map.on("moveend zoomend resize viewreset", draw);
+    map.on("moveend zoomend resize viewreset", scheduleDraw);
     return () => {
-      map.off("moveend zoomend resize viewreset", draw);
+      if (rafId !== null) cancelAnimationFrame(rafId);
+      map.off("moveend zoomend resize viewreset", scheduleDraw);
       L.DomUtil.remove(canvas);
     };
   }, [
