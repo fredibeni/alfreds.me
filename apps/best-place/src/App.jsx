@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/react";
 import FilterPanel, { MIN_POP } from "./components/FilterPanel.jsx";
@@ -45,33 +45,21 @@ export default function App() {
   // Bumped by the Cities tab's "Add your city" link; FilterPanel focuses its city box on change.
   const [focusCityRequest, setFocusCityRequest] = useState(0);
 
-  // Two separate questions, deliberately not the same flag.
-  //
-  // Whether to MOUNT the map: on mobile, not until the Map tab is opened, so Leaflet's setup
-  // never competes with the city list for the main thread.
+  // Whether to MOUNT the map. On mobile, not until the Map tab is opened — initialising Leaflet
+  // and its 1753 markers is expensive and would compete with the city list for the main thread.
+  // This is separate from fetching, below, which now always starts immediately.
   const mapVisible = !isMobile || tab === "map";
-  // Whether to FETCH its assets: as soon as the browser is idle after the city data lands.
-  // Waiting for the tab meant the ~1.7 MB grid download only started on the tap, so the
-  // heatmap took about five seconds to appear. Prefetching moves that off the critical path
-  // without delaying first paint — the request is issued during idle time, after the list is
-  // already interactive.
-  const [prefetchMap, setPrefetchMap] = useState(false);
-  useEffect(() => {
-    if (!data || prefetchMap) return undefined;
-    const idle = window.requestIdleCallback;
-    if (!idle) {
-      const t = setTimeout(() => setPrefetchMap(true), 1000);
-      return () => clearTimeout(t);
-    }
-    const id = idle(() => setPrefetchMap(true), { timeout: 2500 });
-    return () => window.cancelIdleCallback(id);
-  }, [data, prefetchMap]);
-
-  const mapNeeded = mapVisible || prefetchMap;
 
   useEffect(() => {
-    // City metadata plus the packed per-city climate histograms (see src/climate.js). Each city
-    // carries its own index into the shared buffer so the detail card can query it directly.
+    // Every asset, in parallel, from the first paint.
+    //
+    // Mobile used to hold the map's assets back until the Map tab was tapped, and then until idle
+    // after that. Both were worth it when this payload was 29 MB; at 2.65 MB the deferral only
+    // buys latency. Worse, requestIdleCallback does not fire while the main thread is busy
+    // rendering the city list, so the grid request landed on its 2.5 s timeout — right about
+    // when the tab gets tapped — and the heatmap took ~5 s to appear. Requesting everything up
+    // front costs the city list almost nothing (0.5 MB against the grid's 1.7 MB, multiplexed
+    // over one connection) and means the grid is usually decoded before the tab is opened.
     Promise.all([
       fetch(`${import.meta.env.BASE_URL}cities.json`).then((r) => r.json()),
       fetch(`${import.meta.env.BASE_URL}city-clim.bin`).then((r) => r.arrayBuffer()),
@@ -83,27 +71,21 @@ export default function App() {
         setData(d);
       })
       .catch((e) => setError(String(e)));
-  }, []);
 
-  const mapAssetsRequested = useRef(false);
-  useEffect(() => {
-    if (!mapNeeded || mapAssetsRequested.current) return;
-    mapAssetsRequested.current = true;
     fetch(`${import.meta.env.BASE_URL}world.min.geojson`).then((r) => r.json()).then(setGeojson).catch(() => {});
-    // Climate grid: a small metadata JSON plus the packed histograms (see src/climate.js).
     Promise.all([
       fetch(`${import.meta.env.BASE_URL}grid-meta.json`).then((r) => r.json()),
       fetch(`${import.meta.env.BASE_URL}grid-clim.bin`).then((r) => r.arrayBuffer()),
     ])
       .then(([meta, buf]) => setGrid({ ...meta, packed: readPacked(buf, meta.cells.length) }))
       .catch(() => {});
-  }, [mapNeeded]);
+  }, []);
 
   // Once the Map tab has been opened, keep it mounted (hidden) so Leaflet doesn't re-initialise
   // — and so the user's pan/zoom survives tab switches.
   const [mapMounted, setMapMounted] = useState(!isMobile);
   useEffect(() => {
-    if (mapVisible) setMapMounted(true); // mapVisible, not mapNeeded — prefetching must not mount
+    if (mapVisible) setMapMounted(true);
   }, [mapVisible]);
 
   const cities = data?.cities;
@@ -230,7 +212,13 @@ export default function App() {
           onExpand={() => setTab("cities")}
         />
       )}
-      {!geojson && <div className="map-toast neutral">Loading map…</div>}
+      {/* The heatmap needs the climate grid, which is the largest asset and arrives after the
+          outline and pins. Say so, rather than leaving the map looking finished but wrong. */}
+      {!geojson ? (
+        <div className="map-toast neutral">Loading map…</div>
+      ) : climate && !grid ? (
+        <div className="map-toast neutral">Preparing heatmap…</div>
+      ) : null}
       <div className="legend">
         <span className="legend-title">
           Climate heatmap
