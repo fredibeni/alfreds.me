@@ -147,22 +147,56 @@ function GridHeatLayer({
       }
     }
 
-    // Build a canvas clip path from the on-screen land polygons so nothing paints over the ocean.
-    const clipToLand = (south, north, west, east) => {
-      ctx.beginPath();
-      const addRing = (ring) => {
-        for (let k = 0; k < ring.length; k++) {
-          const p = map.latLngToContainerPoint([ring[k][1], ring[k][0]]);
-          if (k === 0) ctx.moveTo(p.x, p.y); else ctx.lineTo(p.x, p.y);
-        }
-        ctx.closePath();
-      };
+    // Clip fills to land so nothing paints over the ocean.
+    //
+    // Re-projecting the coastline on every redraw was measured at 64 ms of a 90 ms draw — 71% of
+    // it — because the outline carries tens of thousands of vertices and each one costs a
+    // projection. But layer coordinates do not change when you pan, only when you zoom: at a
+    // fixed zoom a pan just moves the canvas's origin within the same layer space. So the
+    // projected path is built once and reused, and panning costs one matrix translation.
+    //
+    // The path still only covers polygons near the view, since projecting the whole world would
+    // undo the existing off-screen culling at high zoom. It is built for a generously padded
+    // viewport and rebuilt when the view leaves that padding.
+    let clipCache = null; // { zoom, south, north, west, east, path }
+    const buildLandPath = (south, north, west, east) => {
+      const path = new Path2D();
       for (const poly of landPolys) {
         if (poly.maxY < south || poly.minY > north) continue;
         if (poly.maxX < west || poly.minX > east) continue;
-        poly.rings.forEach(addRing);
+        for (const ring of poly.rings) {
+          for (let k = 0; k < ring.length; k++) {
+            const p = map.latLngToLayerPoint([ring[k][1], ring[k][0]]);
+            if (k === 0) path.moveTo(p.x, p.y); else path.lineTo(p.x, p.y);
+          }
+          path.closePath();
+        }
       }
-      ctx.clip();
+      return path;
+    };
+    const clipToLand = (south, north, west, east) => {
+      const zoom = map.getZoom();
+      const c = clipCache;
+      const usable = c && c.zoom === zoom &&
+        south >= c.south && north <= c.north && west >= c.west && east <= c.east;
+      if (!usable) {
+        // Pad by a full viewport on each side, so ordinary panning keeps hitting the cache.
+        const padY = (north - south) || 1;
+        const padX = Number.isFinite(east - west) ? (east - west) || 1 : 0;
+        clipCache = {
+          zoom,
+          south: south - padY, north: north + padY,
+          west: Number.isFinite(west) ? west - padX : west,
+          east: Number.isFinite(east) ? east + padX : east,
+          path: null,
+        };
+        clipCache.path = buildLandPath(clipCache.south, clipCache.north, clipCache.west, clipCache.east);
+      }
+      // The cached path is in layer coordinates; shift it into this canvas's container space.
+      const origin = map.containerPointToLayerPoint([0, 0]);
+      const shifted = new Path2D();
+      shifted.addPath(clipCache.path, new DOMMatrix().translateSelf(-origin.x, -origin.y));
+      ctx.clip(shifted);
     };
 
     const draw = () => {
@@ -285,10 +319,17 @@ function GridHeatLayer({
       rafId = requestAnimationFrame(() => { rafId = null; draw(); });
     };
 
+    // The cached clip path holds Leaflet layer coordinates, which are only stable while the map
+    // keeps the same pixel origin. viewreset is exactly the event that says otherwise (zoom, and
+    // the re-centring worldCopyJump does at the antimeridian), so drop the cache when it fires.
+    const dropClipCache = () => { clipCache = null; };
+
     draw();
+    map.on("viewreset", dropClipCache);
     map.on("moveend zoomend resize viewreset", scheduleDraw);
     return () => {
       if (rafId !== null) cancelAnimationFrame(rafId);
+      map.off("viewreset", dropClipCache);
       map.off("moveend zoomend resize viewreset", scheduleDraw);
       L.DomUtil.remove(canvas);
     };
