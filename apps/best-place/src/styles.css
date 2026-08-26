@@ -341,8 +341,19 @@ button.continent-toggle { cursor: pointer; }
   display: flex;
   flex-direction: column;
   height: 100%;
-  height: 100dvh; /* survives the mobile browser's collapsing address bar */
+  /* Large viewport, not dynamic: lvh is the height with the browser's chrome retracted, so the
+     shell keeps running underneath iOS Safari's floating bottom address bar instead of stopping
+     short of it. The map then fills the whole screen. */
+  height: 100lvh;
+  /* How much of that is currently covered by the browser's own bar — zero once the user scrolls
+     it away. Anything the user must be able to see or tap near the bottom is lifted by this. */
+  --chrome: calc(100lvh - 100dvh);
   overflow: hidden;
+}
+
+/* No dvh/lvh support (Safari < 15.4): fall back to the old behaviour rather than guessing. */
+@supports not (height: 100dvh) {
+  .mobile-shell { height: 100%; --chrome: 0px; }
 }
 
 /* ---- Header: title centred on the page, back link to its left ----
@@ -415,7 +426,7 @@ button.continent-toggle { cursor: pointer; }
 
 .mobile-shell .panel {
   --gutter: 14px; /* single source for the side padding and anything that full-bleeds past it */
-  padding: 14px var(--gutter) calc(22px + env(safe-area-inset-bottom));
+  padding: 14px var(--gutter) calc(22px + env(safe-area-inset-bottom) + var(--chrome));
   overflow-x: hidden; /* a stray wide child must never scroll the panel sideways */
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
@@ -451,6 +462,7 @@ button.continent-toggle { cursor: pointer; }
 /* Full-bleed opaque footer (the desktop gradient fade lets the sliders show through the
    buttons at this size), negative margins cancelling the panel's 14px gutter. */
 .mobile-shell .actions {
+  bottom: var(--chrome);
   margin: 12px calc(-1 * var(--gutter)) 0;
   padding: 12px var(--gutter) calc(12px + env(safe-area-inset-bottom));
   background: var(--panel);
@@ -488,7 +500,7 @@ button.continent-toggle { cursor: pointer; }
 .mobile-shell .legend {
   width: 150px; padding: 8px 10px; font-size: 11px;
   left: max(10px, env(safe-area-inset-left));
-  bottom: calc(10px + env(safe-area-inset-bottom));
+  bottom: calc(10px + env(safe-area-inset-bottom) + var(--chrome));
 }
 .mobile-shell .legend-hint { display: none; }
 /* The detail card becomes a bottom sheet rather than a 300px card on a 360px screen. */
@@ -497,7 +509,7 @@ button.continent-toggle { cursor: pointer; }
   top: auto; width: auto;
   left: max(10px, env(safe-area-inset-left));
   right: max(10px, env(safe-area-inset-right));
-  bottom: calc(10px + env(safe-area-inset-bottom));
+  bottom: calc(10px + env(safe-area-inset-bottom) + var(--chrome));
   max-height: 60%; overflow-y: auto; overscroll-behavior: contain;
   padding: 14px 14px 12px;
   /* Fully opaque: the sheet sits over the legend, which ghosted through the desktop card's
