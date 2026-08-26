@@ -70,6 +70,13 @@ function GridHeatLayer({
     pane.style.pointerEvents = "none";
     const canvas = L.DomUtil.create("canvas", "grid-heat-canvas", pane);
     canvas.style.opacity = "0.72"; // layer-level transparency (avoids overlap darkening)
+    // followZoom (below) positions this canvas by its top-left corner and then scales it, which
+    // is only correct if the scale is anchored there too. CSS defaults transform-origin to the
+    // element's centre, so the scale pushed the bitmap outward from the middle and the heatmap
+    // slid off the map as the pinch grew — 1576px adrift at 5x. Leaflet's own renderer canvases
+    // get this from the leaflet-zoom-animated class in leaflet.css; set it explicitly here
+    // rather than depend on a class whose other effects this layer does not want.
+    canvas.style.transformOrigin = "0 0";
     const ctx = canvas.getContext("2d");
     const { cells, res, countryTax } = grid;
 
