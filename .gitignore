@@ -6,3 +6,6 @@ dist/
 
 # Large, regenerable scraping intermediates (rebuild with apps/best-place/scripts)
 apps/best-place/scripts/out/
+
+# Local-only notes - never commit
+*.local.md
