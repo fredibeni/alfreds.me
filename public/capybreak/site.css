@@ -69,23 +69,15 @@ a:focus-visible,
   padding-top: 28px;
 }
 
-.back-link,
-.nav-link {
+.back-link {
   color: var(--muted);
   font-size: 15px;
   font-weight: 600;
   text-decoration: none;
 }
 
-.back-link:hover,
-.nav-link:hover {
+.back-link:hover {
   color: var(--text);
-}
-
-.nav-links {
-  display: flex;
-  align-items: center;
-  gap: 20px;
 }
 
 .hero {
@@ -358,36 +350,9 @@ code {
 }
 
 .wellness-note {
-  margin-top: 42px;
+  margin: 42px 0 48px;
   color: var(--muted);
   font-size: 14px;
-}
-
-.page-footer {
-  width: min(var(--content-width), calc(100% - 48px));
-  margin: 70px auto 0;
-  border-top: 1px solid var(--line);
-  padding: 28px 0 48px;
-  color: var(--muted);
-  font-size: 14px;
-}
-
-.footer-row {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 22px;
-  flex-wrap: wrap;
-}
-
-.footer-links {
-  display: flex;
-  gap: 18px;
-  flex-wrap: wrap;
-}
-
-.page-footer p {
-  margin: 0;
 }
 
 @media (max-width: 800px) {
@@ -403,18 +368,13 @@ code {
 
 @media (max-width: 620px) {
   .shell,
-  .text-shell,
-  .page-footer {
+  .text-shell {
     width: min(100% - 32px, var(--content-width));
   }
 
   .site-nav {
     align-items: flex-start;
     padding-top: 20px;
-  }
-
-  .nav-links {
-    gap: 13px;
   }
 
   .hero {
@@ -465,12 +425,6 @@ code {
 @media (max-width: 390px) {
   body {
     font-size: 16px;
-  }
-
-  .nav-links {
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 7px;
   }
 
   .hero {
