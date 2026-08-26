@@ -147,7 +147,7 @@ function GridHeatLayer({
       }
     }
 
-    // Clip fills to land so nothing paints over the ocean.
+    // Mask fills to land so nothing paints over the ocean.
     //
     // Re-projecting the coastline on every redraw was measured at 64 ms of a 90 ms draw — 71% of
     // it — because the outline carries tens of thousands of vertices and each one costs a
@@ -174,7 +174,8 @@ function GridHeatLayer({
       }
       return path;
     };
-    const clipToLand = (south, north, west, east) => {
+    // Returns the land outline in this canvas's coordinates, for use as a mask.
+    const landMask = (south, north, west, east) => {
       const zoom = map.getZoom();
       const c = clipCache;
       const usable = c && c.zoom === zoom &&
@@ -196,7 +197,7 @@ function GridHeatLayer({
       const origin = map.containerPointToLayerPoint([0, 0]);
       const shifted = new Path2D();
       shifted.addPath(clipCache.path, new DOMMatrix().translateSelf(-origin.x, -origin.y));
-      ctx.clip(shifted);
+      return shifted;
     };
 
     const draw = () => {
@@ -263,7 +264,17 @@ function GridHeatLayer({
       const SUB = Math.max(2, Math.min(12, Math.ceil(cellPx / 8)));
 
       ctx.save();
-      clipToLand(south, north, west, east); // confine fills to on-screen land
+      // Confine the fills to land AFTER drawing them, not by clipping each one.
+      //
+      // Clipping was catastrophic on iOS: measured on an iPhone 14 Pro, a single draw froze the
+      // screen for 10.2 s — no frames at all, while JS stayed responsive (worst main-thread
+      // block 91 ms), because the stall is in the rasteriser rather than in script. Bisecting it
+      // showed the cost is the *combination*: dropping the clip removed the stall, and so did
+      // dropping the fills, but together ~30k fillRects each clipped against a path of tens of
+      // thousands of coastline vertices degrades pathologically. Masking once with
+      // destination-in is one path operation instead of ~30k clipped ones, and produces a
+      // pixel-identical result (verified on device: 296,455 opaque pixels either way).
+      const maskPath = landMask(south, north, west, east);
       // Fills are opaque (overlaps overwrite instead of stacking); the canvas element's
       // CSS opacity provides the see-through effect uniformly.
       for (let i = 0; i < cells.length; i++) {
@@ -306,6 +317,10 @@ function GridHeatLayer({
           }
         }
       }
+      // Keep only what overlaps land. One composite op, not a clip on every fill.
+      ctx.globalCompositeOperation = "destination-in";
+      ctx.fill(maskPath);
+      ctx.globalCompositeOperation = "source-over";
       ctx.restore();
     };
 
