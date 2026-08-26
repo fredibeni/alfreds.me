@@ -44,7 +44,8 @@ a:hover {
 }
 
 a:focus-visible,
-.store-status:focus-visible {
+.store-status:focus-visible,
+.project-detail summary:focus-visible {
   border-radius: 5px;
   outline: 3px solid var(--accent);
   outline-offset: 4px;
@@ -248,83 +249,92 @@ h1 {
   font-size: 15px;
 }
 
-.privacy-callout {
-  border: 1px solid rgba(110, 231, 220, 0.35);
-  border-radius: 18px;
+.project-details {
+  display: grid;
+  gap: 12px;
+}
+
+.project-detail {
+  overflow: hidden;
+  scroll-margin-top: 24px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
   background: var(--surface);
-  padding: 28px;
 }
 
-.privacy-callout h2 {
-  margin: 0 0 10px;
-  font-size: 25px;
+.project-detail[open],
+.project-detail:target {
+  border-color: rgba(110, 231, 220, 0.45);
+}
+
+.project-detail summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 64px;
+  padding: 16px 20px;
+  cursor: pointer;
+  color: var(--text);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 20px;
   font-weight: 500;
+  list-style: none;
 }
 
-.privacy-callout p {
-  max-width: 720px;
-  margin: 0 0 14px;
-  color: var(--muted);
+.project-detail summary::-webkit-details-marker {
+  display: none;
 }
 
-.wellness-note {
-  margin-top: 42px;
-  color: var(--muted);
-  font-size: 14px;
-}
-
-.page-header {
-  padding: 68px 0 28px;
-}
-
-.page-header h1 {
-  font-size: clamp(38px, 7vw, 62px);
-}
-
-.page-lede {
-  max-width: 680px;
-  margin: 12px 0 0;
-  color: var(--muted);
-  font-size: 19px;
-}
-
-.effective-date {
-  margin: 10px 0 0;
+.project-detail summary::after {
+  content: "+";
   color: var(--accent);
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 25px;
+  font-weight: 400;
+  line-height: 1;
 }
 
-.legal-main {
-  padding: 12px 0 50px;
+.project-detail[open] summary::after {
+  content: "-";
 }
 
-.legal-main h2 {
-  margin: 42px 0 12px;
-  font-size: 24px;
-  font-weight: 500;
+.project-detail-content {
+  border-top: 1px solid var(--line);
+  padding: 22px 20px 24px;
 }
 
-.legal-main h3 {
-  margin: 26px 0 9px;
+.project-detail-content h3 {
+  margin: 28px 0 9px;
   font-size: 18px;
   font-weight: 500;
 }
 
-.legal-main p,
-.legal-main li {
+.project-detail-content h3:first-child,
+.project-detail-content > :first-child {
+  margin-top: 0;
+}
+
+.project-detail-content p,
+.project-detail-content li {
   color: var(--muted);
 }
 
-.legal-main p,
-.legal-main ul,
-.legal-main ol {
-  margin: 0 0 18px;
+.project-detail-content p,
+.project-detail-content ul {
+  margin: 0 0 16px;
 }
 
-.legal-main ul,
-.legal-main ol {
+.project-detail-content > :last-child {
+  margin-bottom: 0;
+}
+
+.project-detail-content ul {
   padding-left: 24px;
+}
+
+.effective-date {
+  color: var(--accent) !important;
+  font-size: 14px;
+  font-weight: 600;
 }
 
 .notice {
@@ -333,17 +343,6 @@ h1 {
   background: rgba(110, 231, 220, 0.08);
   padding: 20px;
   color: var(--text) !important;
-}
-
-.contact-card {
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  background: var(--surface);
-  padding: 20px;
-}
-
-.contact-card p:last-child {
-  margin-bottom: 0;
 }
 
 address {
@@ -357,6 +356,12 @@ code {
   color: var(--text);
   padding: 2px 5px;
   font-size: 0.88em;
+}
+
+.wellness-note {
+  margin-top: 42px;
+  color: var(--muted);
+  font-size: 14px;
 }
 
 .page-footer {
@@ -456,9 +461,6 @@ code {
     padding-top: 48px;
   }
 
-  .page-header {
-    padding-top: 48px;
-  }
 }
 
 @media (max-width: 390px) {
@@ -487,10 +489,14 @@ code {
     font-size: 35px;
   }
 
-  .privacy-callout,
   .feature,
-  .contact-card {
+  .project-detail-content {
     padding: 18px;
+  }
+
+  .project-detail summary {
+    min-height: 58px;
+    padding: 14px 18px;
   }
 }
 

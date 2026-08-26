@@ -7,7 +7,7 @@ Source for my personal website, built as a static site and deployed on [Vercel](
 ```
 ├── public/                  # Landing page and static project pages
 │   ├── index.html           # Home page
-│   ├── capybreak/           # CapyBreak product, privacy, support and accessibility pages
+│   ├── capybreak/           # CapyBreak page, assets and shared styles
 │   ├── robots.txt
 │   └── sitemap.xml
 ├── apps/
@@ -35,10 +35,10 @@ The landing page is plain HTML with no build step - edit `public/index.html` dir
 
 ### CapyBreak
 
-A private macOS menu bar timer that reminds people to get up regularly. The static
-product page, privacy policy, support information and accessibility information live
-under `public/capybreak/`. Web-optimised screenshots are derived from the app's own
-App Store assets.
+A private macOS menu bar timer that reminds people to get up regularly. Its product,
+support, privacy and accessibility information share one static page under
+`public/capybreak/`. Web-optimised screenshots are derived from the app's own App Store
+assets.
 
 CapyBreak artwork and screenshots under `public/capybreak/assets/` are Copyright 2026
 Alfred Strabel. All rights reserved. They are not covered by this repository's MIT

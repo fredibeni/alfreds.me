@@ -31,12 +31,7 @@
     "applicationCategory": "HealthApplication",
     "operatingSystem": "macOS 13 or later",
     "softwareVersion": "1.0.0",
-    "url": "https://alfreds.me/capybreak/",
-    "author": {
-      "@type": "Person",
-      "name": "Alfred Strabel",
-      "url": "https://alfreds.me/"
-    }
+    "url": "https://alfreds.me/capybreak/"
   }
   </script>
 </head>
@@ -44,8 +39,8 @@
   <nav class="site-nav shell" aria-label="CapyBreak">
     <a class="back-link" href="/">Back to projects</a>
     <div class="nav-links">
-      <a class="nav-link" href="/capybreak/support/">Support</a>
-      <a class="nav-link" href="/capybreak/privacy/">Privacy</a>
+      <a class="nav-link" href="#support">Support</a>
+      <a class="nav-link" href="#privacy">Privacy</a>
     </div>
   </nav>
 
@@ -130,11 +125,68 @@
       </div>
     </section>
 
-    <section class="section shell" aria-labelledby="privacy-title">
-      <div class="privacy-callout">
-        <h2 id="privacy-title">Private by design</h2>
-        <p>CapyBreak processes activity signals, application state and optional reminder exceptions on your Mac. Browser addresses are checked only when a reminder is due or delayed, compared locally with your enabled list, then immediately discarded.</p>
-        <a href="/capybreak/privacy/">Read the CapyBreak Privacy Policy</a>
+    <section class="section shell" aria-labelledby="project-information-title">
+      <h2 class="section-heading" id="project-information-title">Information</h2>
+      <div class="project-details">
+        <details class="project-detail" id="support">
+          <summary>Support</summary>
+          <div class="project-detail-content">
+            <p>Email <a href="mailto:hello@alfreds.me">hello@alfreds.me</a> for app support, feedback, feature requests, privacy requests or data protection complaints.</p>
+            <p>Data protection complaints will be acknowledged within 30 days, investigated without undue delay and followed by an outcome.</p>
+          </div>
+        </details>
+
+        <details class="project-detail" id="privacy">
+          <summary>Privacy Policy</summary>
+          <div class="project-detail-content">
+            <p class="effective-date">Effective 26 August 2026</p>
+            <p class="notice">CapyBreak works locally on your Mac. It has no account, advertising, analytics, telemetry, cloud storage or networking feature. The app does not transmit personal data, activity information, browser addresses or settings to the developer or any third party.</p>
+
+            <h3>On-device information</h3>
+            <p>CapyBreak stores your timer settings, enabled features and reminder-exception lists in its macOS sandbox. They remain on your Mac.</p>
+            <p>While the timer is on, CapyBreak uses aggregate system event counters to detect keyboard presses, mouse clicks and scrolling. It does not read or store the keys you press, typed text, pointer position, documents, screenshots, clipboard contents or activity history. Mouse movement alone is ignored.</p>
+            <p>When a reminder is due or delayed, CapyBreak may check application and full-screen window state, camera or microphone use, and, if you enable website exceptions, addresses of open Safari and Chrome tabs. These checks decide whether a reminder exception applies. CapyBreak does not capture application content, audio or video. Browser addresses are compared locally with your enabled list and immediately discarded.</p>
+
+            <h3>Sharing</h3>
+            <p>The app does not sell, share or transmit personal information and contains no third-party analytics, advertising or data service.</p>
+
+            <h3>Retention and controls</h3>
+            <p>Activity signals, device-use state, application and window state, and browser addresses are used temporarily and not retained. Local settings remain until you change them or remove CapyBreak's app data.</p>
+            <p>You can turn the timer off or quit CapyBreak to stop checks, disable reminder exceptions, revoke browser access in macOS System Settings, and disable Launch at login. To remove all local settings, turn off Launch at login, quit CapyBreak, then remove <code>~/Library/Containers/com.capybreak.app</code>.</p>
+
+            <h3>Support and this website</h3>
+            <p>If you email support, the information you send is used to respond to your request, investigate problems and handle privacy requests or data protection complaints. It is processed by the sender's and recipient's email providers and kept only as long as needed to handle the request or meet legal obligations.</p>
+            <p>These pages use no analytics or advertising. Vercel hosts the site and processes ordinary request information to deliver and secure it under its <a href="https://vercel.com/legal/privacy-notice" rel="external">privacy notice</a>.</p>
+            <p>The lawful basis for this processing is the developer's legitimate interest in providing support and operating a secure website. It is not used for advertising, profiling or automated decisions.</p>
+
+            <h3>Your rights</h3>
+            <p>You may ask whether personal information is held about you and request access, correction or deletion where applicable. You may also object to or ask to restrict processing. Email <a href="mailto:hello@alfreds.me">hello@alfreds.me</a> to exercise a right or make a data protection complaint. Complaints will be acknowledged within 30 days, investigated without undue delay and followed by an outcome. You may also complain to the <a href="https://ico.org.uk/make-a-complaint/" rel="external">UK Information Commissioner's Office</a>.</p>
+
+            <h3>Contact</h3>
+            <address>
+              <p>Data controller: Alfred Strabel<br>
+              Email: <a href="mailto:hello@alfreds.me">hello@alfreds.me</a></p>
+            </address>
+          </div>
+        </details>
+
+        <details class="project-detail" id="accessibility">
+          <summary>Accessibility</summary>
+          <div class="project-detail-content">
+            <p>The exact Mac App Store accessibility labels will be selected only after their required manual tests pass on the submitted build.</p>
+            <ul>
+              <li>Native, labelled Yes and No controls with a spoken selected state.</li>
+              <li>Keyboard navigation that keeps focus and the visible answer selection aligned.</li>
+              <li>A high-priority VoiceOver announcement when the movement countdown succeeds.</li>
+              <li>Reduce Motion support that replaces the repeating exercise animation with a still pose.</li>
+              <li>VoiceOver actions that move the draggable capybara reminder or return it to the centre.</li>
+              <li>Contextual spoken labels for timer information and bulk application or website actions.</li>
+              <li>State text and menu bar silhouettes that do not depend on colour alone.</li>
+              <li>A semantic accent colour chosen for readable contrast on light and dark system backgrounds.</li>
+            </ul>
+            <p>For accessibility feedback, email <a href="mailto:hello@alfreds.me">hello@alfreds.me</a>.</p>
+          </div>
+        </details>
       </div>
       <p class="wellness-note">CapyBreak is a general wellness timer. It does not provide medical advice, diagnosis or treatment.</p>
     </section>
@@ -142,14 +194,29 @@
 
   <footer class="page-footer">
     <div class="footer-row">
-      <p>Copyright 2026 Alfred Strabel.</p>
+      <p>CapyBreak</p>
       <div class="footer-links">
-        <a href="/capybreak/support/">Support</a>
-        <a href="/capybreak/privacy/">Privacy</a>
-        <a href="/capybreak/accessibility/">Accessibility</a>
+        <a href="#support">Support</a>
+        <a href="#privacy">Privacy</a>
+        <a href="#accessibility">Accessibility</a>
         <a href="/">Alfred's projects</a>
       </div>
     </div>
   </footer>
+  <script>
+    (() => {
+      const openLinkedSection = () => {
+        const id = window.location.hash.slice(1);
+        const target = id ? document.getElementById(id) : null;
+        if (target instanceof HTMLDetailsElement) {
+          target.open = true;
+          window.requestAnimationFrame(() => target.scrollIntoView({ block: "start" }));
+        }
+      };
+
+      window.addEventListener("hashchange", openLinkedSection);
+      openLinkedSection();
+    })();
+  </script>
 </body>
 </html>
