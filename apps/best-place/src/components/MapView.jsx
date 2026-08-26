@@ -220,16 +220,27 @@ function GridHeatLayer({
       // less than half the pixels of a full 3x buffer. The layer is a soft 72%-opacity
       // gradient, so the last of the sharpness is not worth the frame time.
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      canvas.width = Math.round(size.x * dpr);
-      canvas.height = Math.round(size.y * dpr);
-      canvas.style.width = `${size.x}px`;
-      canvas.style.height = `${size.y}px`;
+      // Draw a margin beyond the viewport, as Leaflet's own renderers do (their `padding`
+      // option, default 0.1). A pinch scales this bitmap in place, so at any zoom below the one
+      // it was drawn at it covers less ground than the screen: without a margin the heatmap
+      // pulled away from the edges mid-gesture while the countries stayed put. The margin costs
+      // 21% more area to fill, which is worth it to keep the layer whole during the gesture.
+      const PAD = 0.1;
+      const padX = Math.round(size.x * PAD), padY = Math.round(size.y * PAD);
+      const cssW = size.x + padX * 2, cssH = size.y + padY * 2;
+      canvas.width = Math.round(cssW * dpr);
+      canvas.height = Math.round(cssH * dpr);
+      canvas.style.width = `${cssW}px`;
+      canvas.style.height = `${cssH}px`;
       // Remember what this bitmap depicts, so a pinch can transform it to match (see below).
       drawnZoom = map.getZoom();
-      drawnTopLeft = map.containerPointToLatLng([0, 0]);
-      L.DomUtil.setTransform(canvas, map.containerPointToLayerPoint([0, 0]), 1);
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0); // keep drawing in CSS pixels
-      ctx.clearRect(0, 0, size.x, size.y);
+      drawnTopLeft = map.containerPointToLatLng([-padX, -padY]);
+      L.DomUtil.setTransform(canvas, map.containerPointToLayerPoint([-padX, -padY]), 1);
+      // Keep drawing in CSS pixels, still in CONTAINER coordinates: the translate places
+      // container (0,0) at the canvas's inset origin, so every projection below is unchanged
+      // and the land mask (also container-space) needs no adjustment.
+      ctx.setTransform(dpr, 0, 0, dpr, padX * dpr, padY * dpr);
+      ctx.clearRect(-padX, -padY, cssW, cssH);
       const W = size.x, H = size.y;
       // Snap a CSS-pixel coordinate onto the device-pixel grid, so neighbouring fills share an
       // exact edge: no gap for the land base to show through, and no double-drawn seam.
@@ -244,7 +255,12 @@ function GridHeatLayer({
       // local window keeps the palette mapped to the regional variation at every zoom level.
       // worldCopyJump can widen the bounds past a full turn; treating that as "no longitude
       // limit" (±Infinity) lets every lon cull below stay a plain range test with no guard.
-      const b = map.getBounds();
+      // The padded area actually being drawn, not just the viewport, so cells and coastline in
+      // the margin are included rather than culled away.
+      const b = L.latLngBounds(
+        map.containerPointToLatLng([-padX, -padY]),
+        map.containerPointToLatLng([size.x + padX, size.y + padY])
+      );
       const south = b.getSouth(), north = b.getNorth();
       let west = b.getWest(), east = b.getEast();
       if (east - west >= 359) { west = -Infinity; east = Infinity; }
@@ -301,7 +317,7 @@ function GridHeatLayer({
         const p2 = map.latLngToContainerPoint([c.lat + res, c.lon + res]);
         const x0 = Math.min(p1.x, p2.x), y0 = Math.min(p1.y, p2.y);
         const cw = Math.abs(p2.x - p1.x), ch = Math.abs(p2.y - p1.y);
-        if (x0 + cw < 0 || y0 + ch < 0 || x0 > W || y0 > H) continue; // off-screen
+        if (x0 + cw < -padX || y0 + ch < -padY || x0 > W + padX || y0 > H + padY) continue; // outside drawn area
 
         // Corner values for bilinear interpolation (fall back to this cell where a
         // neighbour is missing, so colour transitions stay smooth).
