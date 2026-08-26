@@ -200,6 +200,9 @@ function GridHeatLayer({
       return shifted;
     };
 
+    // What the current bitmap depicts; set on every draw, read by followZoom below.
+    let drawnZoom = null, drawnTopLeft = null;
+
     const draw = () => {
       const size = map.getSize();
       // Back the canvas above CSS resolution, but capped. Sized at 1x it was upscaled by the
@@ -214,7 +217,10 @@ function GridHeatLayer({
       canvas.height = Math.round(size.y * dpr);
       canvas.style.width = `${size.x}px`;
       canvas.style.height = `${size.y}px`;
-      L.DomUtil.setPosition(canvas, map.containerPointToLayerPoint([0, 0]));
+      // Remember what this bitmap depicts, so a pinch can transform it to match (see below).
+      drawnZoom = map.getZoom();
+      drawnTopLeft = map.containerPointToLatLng([0, 0]);
+      L.DomUtil.setTransform(canvas, map.containerPointToLayerPoint([0, 0]), 1);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0); // keep drawing in CSS pixels
       ctx.clearRect(0, 0, size.x, size.y);
       const W = size.x, H = size.y;
@@ -324,6 +330,27 @@ function GridHeatLayer({
       ctx.restore();
     };
 
+    // Follow the zoom while it is happening.
+    //
+    // Leaflet's own renderers scale their canvas with a CSS transform on every `zoom` event, which
+    // is how the markers and country outlines stay glued together mid-pinch. This canvas had no
+    // such handler, so during a pinch it kept the scale it was last drawn at while everything
+    // else moved — the layers visibly came apart until the gesture ended and it redrew.
+    //
+    // The bitmap is a picture of the map at (drawnTopLeft, drawnZoom). To keep it registered at
+    // any other zoom, scale it by the ratio between the two and re-place its top-left corner —
+    // the same maths Renderer._updateTransform does.
+    const followZoom = (e) => {
+      if (drawnZoom === null) return;
+      const zoom = e && e.zoom != null ? e.zoom : map.getZoom();
+      const center = e && e.center ? e.center : map.getCenter();
+      L.DomUtil.setTransform(
+        canvas,
+        map._latLngToNewLayerPoint(drawnTopLeft, zoom, center),
+        map.getZoomScale(zoom, drawnZoom)
+      );
+    };
+
     // Redraw on the next frame rather than inside the event handler. Drawing synchronously meant
     // a pan's moveend blocked whatever the user did next — pan, then immediately pinch, and the
     // zoom waited on a full repaint before it was even handled. Coalescing also collapses a
@@ -341,10 +368,12 @@ function GridHeatLayer({
 
     draw();
     map.on("viewreset", dropClipCache);
+    map.on("zoom zoomanim", followZoom);
     map.on("moveend zoomend resize viewreset", scheduleDraw);
     return () => {
       if (rafId !== null) cancelAnimationFrame(rafId);
       map.off("viewreset", dropClipCache);
+      map.off("zoom zoomanim", followZoom);
       map.off("moveend zoomend resize viewreset", scheduleDraw);
       L.DomUtil.remove(canvas);
     };
@@ -506,10 +535,13 @@ export default function MapView({
            pan and zoom; that cost a measured 743 ms per zoom, and Safari — including every iOS
            browser — is far slower at it than Chrome, which is why the map dragged worst there. */
         preferCanvas
-        zoomAnimation={false} /* the heatmap is a custom canvas that can't transform in perfect
-                                 lockstep with the SVG borders mid-animation (it visibly lagged);
-                                 with animation off, borders + heatmap re-render together in one
-                                 frame - kept snappy by the off-screen culling in the draw above */
+        /* Animation was previously off because the heat canvas could not transform in lockstep
+           with the other layers and visibly lagged. It follows the zoom now (see followZoom in
+           GridHeatLayer), so the reason no longer holds. Measured on an iPhone 14 Pro: with
+           animation on, the heat canvas and Leaflet's own renderer hold the same scale across
+           all 15 animation frames; with it off, the zoom lands in a single abrupt frame where
+           the two disagree. */
+        zoomAnimation
         attributionControl={false}
         style={{ height: "100%", width: "100%", background: WATER }}
       >
