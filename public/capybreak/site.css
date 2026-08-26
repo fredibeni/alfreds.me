@@ -243,6 +243,7 @@ h1 {
 .project-details {
   display: grid;
   gap: 12px;
+  margin-bottom: 48px;
 }
 
 .project-detail {
@@ -347,12 +348,6 @@ code {
   color: var(--text);
   padding: 2px 5px;
   font-size: 0.88em;
-}
-
-.wellness-note {
-  margin: 42px 0 48px;
-  color: var(--muted);
-  font-size: 14px;
 }
 
 @media (max-width: 800px) {
