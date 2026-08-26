@@ -5,8 +5,9 @@ Source for my personal website, built as a static site and deployed on [Vercel](
 ## Project Structure
 
 ```
-├── public/                  # Landing page, served at the site root
+├── public/                  # Landing page and static project pages
 │   ├── index.html           # Home page
+│   ├── capybreak/           # CapyBreak product, privacy, support and accessibility pages
 │   ├── robots.txt
 │   └── sitemap.xml
 ├── apps/
@@ -32,6 +33,17 @@ The landing page is plain HTML with no build step - edit `public/index.html` dir
 
 ## Projects
 
+### CapyBreak
+
+A private macOS menu bar timer that reminds people to get up regularly. The static
+product page, privacy policy, support information and accessibility information live
+under `public/capybreak/`. Web-optimised screenshots are derived from the app's own
+App Store assets.
+
+CapyBreak artwork and screenshots under `public/capybreak/assets/` are Copyright 2026
+Alfred Strabel. All rights reserved. They are not covered by this repository's MIT
+License.
+
 ### Best Place
 
 An interactive world map for deciding where to live. Filters the 200 largest global
@@ -44,8 +56,9 @@ See `apps/best-place/README.md` for the regeneration pipeline.
 
 ## Deployment
 
-Connect the repository to Vercel. It runs `npm run build` and serves `dist/` on every
-push to `main`.
+The repository is connected to Vercel. Pull-request branches receive preview builds.
+After a pull request is merged into `main`, Vercel runs `npm run build` and serves
+`dist/` as the production site.
 
 ## License
 

@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Personal website — alfreds.me",
+  "description": "Personal website - alfreds.me",
   "scripts": {
     "build": "npm --prefix apps/best-place install --no-audit --no-fund && npm --prefix apps/best-place run build && node scripts/assemble.mjs",
     "dev:best-place": "npm --prefix apps/best-place run dev",

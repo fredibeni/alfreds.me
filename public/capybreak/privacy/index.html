@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#0f1621">
+  <meta name="description" content="Privacy policy for the CapyBreak Mac app.">
+  <link rel="canonical" href="https://alfreds.me/capybreak/privacy/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="CapyBreak Privacy Policy">
+  <meta property="og:description" content="How the CapyBreak Mac app handles activity signals, settings and optional reminder exceptions locally.">
+  <meta property="og:url" content="https://alfreds.me/capybreak/privacy/">
+  <meta property="og:image" content="https://alfreds.me/capybreak/assets/capybreak-og-v6.jpg">
+  <title>Privacy Policy - CapyBreak</title>
+  <link rel="icon" type="image/png" sizes="64x64" href="/capybreak/assets/capybreak-favicon-v1.png">
+  <link rel="stylesheet" href="/capybreak/site.css">
+</head>
+<body>
+  <nav class="site-nav text-shell" aria-label="CapyBreak">
+    <a class="back-link" href="/capybreak/">Back to CapyBreak</a>
+    <div class="nav-links">
+      <a class="nav-link" href="/capybreak/support/">Support</a>
+      <a class="nav-link" href="/">Projects</a>
+    </div>
+  </nav>
+
+  <header class="page-header text-shell">
+    <p class="eyebrow">CapyBreak</p>
+    <h1>Privacy Policy</h1>
+    <p class="effective-date">Effective 26 August 2026</p>
+  </header>
+
+  <main class="legal-main text-shell">
+    <p class="notice">The CapyBreak app works locally on your Mac. It has no account system, advertising, in-app analytics, telemetry, crash-reporting service, cloud storage or networking feature. The app does not transmit personal data, activity information, browser addresses or settings to Alfred Strabel or any third party.</p>
+
+    <h2>Who provides CapyBreak</h2>
+    <p>CapyBreak is provided by Alfred Strabel. Contact details are provided under Contact below.</p>
+
+    <h2>Information stored on your Mac</h2>
+    <p>CapyBreak stores the settings you choose in macOS UserDefaults inside its sandbox container. These settings may include timer durations, enabled features, reminder style, application identifiers and display names you add, website domains you add, and whether you have already answered the launch-at-login question. They are not transmitted.</p>
+
+    <h2>Activity detection</h2>
+    <p>While the timer is enabled and the Mac session is available, CapyBreak checks aggregate system event counters approximately every 5 seconds. It checks whether keyboard, modifier-key, mouse-click or scroll events occurred.</p>
+    <p>CapyBreak does not read or store the keys you press, typed text, cursor position, documents, screenshots, clipboard contents or the contents of other applications. Plain mouse movement is ignored. Activity history is not retained.</p>
+
+    <h2>Application and full-screen checks</h2>
+    <p>When a reminder is due or already delayed, CapyBreak may check which application is frontmost. For configured presentation applications and detected games, it may also check whether an on-screen window fills a display.</p>
+    <p>CapyBreak reads application identity, category, process and window-bounds information only to decide whether a configured reminder exception currently applies. It does not capture window images or application content.</p>
+
+    <h2>Camera and microphone state</h2>
+    <p>When a reminder is due or already delayed, CapyBreak may check whether a camera or microphone device is currently in use.</p>
+    <p>CapyBreak does not open a camera or microphone, record audio or video, receive media samples, or identify what is being said or shown.</p>
+    <p>The camera or microphone setting controls whether device use delays a reminder. Device-in-use state may still count as a local passive-presence signal while a reminder is due. To stop all activity and device-state checks, turn the CapyBreak timer off or quit the app.</p>
+
+    <h2>Browser reminder exceptions</h2>
+    <p>If website reminder exceptions are enabled, CapyBreak may ask Safari and Google Chrome for the addresses of open tabs when a reminder is due or already delayed. It checks all tabs in all open windows so a configured activity in a secondary window is not interrupted.</p>
+    <p>Each address is compared on your Mac with the enabled website domains in CapyBreak. Raw browser addresses are immediately discarded. They are not displayed, logged, stored or transmitted.</p>
+    <p>Safari and Chrome access is controlled by macOS Automation permission. You may deny this permission or later revoke it in System Settings. If access is unavailable, CapyBreak continues working without website detection for that browser.</p>
+
+    <h2>Launch at login</h2>
+    <p>CapyBreak asks before registering itself as a login item. You can disable launch at login in CapyBreak Settings or in macOS System Settings.</p>
+
+    <h2>Sharing and third parties</h2>
+    <p>The CapyBreak app does not sell, share, rent or transmit personal information. It contains no advertising network, analytics service, social SDK or third-party data service.</p>
+    <p>The app includes the Press Start 2P font under the SIL Open Font License. The font does not execute network requests or collect information.</p>
+
+    <h2>Retention, deletion and your choices</h2>
+    <p>Observed activity, camera or microphone state, application state, window state and browser addresses are used temporarily in memory and are not retained.</p>
+    <p>Local preferences remain on your Mac until you change them or CapyBreak's local app data is removed. You can remove individual website and application entries in Settings. You can turn the timer off or quit CapyBreak to stop all checks, revoke browser Automation access in macOS System Settings, and disable launch at login at any time.</p>
+    <p>CapyBreak holds no server-side data, so there is no remote account or server record to delete. To remove all locally stored CapyBreak settings, turn off Launch at login in CapyBreak Settings, quit CapyBreak, then in Finder choose Go &gt; Go to Folder and remove <code>~/Library/Containers/com.capybreak.app</code>.</p>
+
+    <h2>Support email</h2>
+    <p>If you choose to email support, the information you send is delivered through the email provider and used to respond to your request. Do not send browser addresses, passwords or other sensitive information unless it is necessary to resolve your issue.</p>
+
+    <h2>This website</h2>
+    <p>This policy primarily describes the CapyBreak app. These CapyBreak pages do not load analytics or advertising scripts. The site is hosted by Vercel, which necessarily receives ordinary web request information, such as an IP address and browser information, to deliver and secure the pages. Vercel handles that information under its <a href="https://vercel.com/legal/privacy-notice" rel="external">privacy notice</a>.</p>
+
+    <h2>Children</h2>
+    <p>CapyBreak is not directed specifically at children and does not knowingly collect information from children or adults.</p>
+
+    <h2>Changes</h2>
+    <p>If CapyBreak's data handling changes, this policy and the App Store privacy answers will be updated before the changed version is distributed. A revised effective date will be shown at the top of this page.</p>
+
+    <h2>Contact</h2>
+    <div class="contact-card">
+      <address>
+        <p>Alfred Strabel<br>
+        Email: <a href="mailto:hello@alfreds.me">hello@alfreds.me</a></p>
+      </address>
+      <p>For app help, visit <a href="/capybreak/support/">CapyBreak Support</a>.</p>
+    </div>
+  </main>
+
+  <footer class="page-footer">
+    <div class="footer-row">
+      <p>CapyBreak - A furry reminder to get up regularly.</p>
+      <div class="footer-links">
+        <a href="/capybreak/">Product</a>
+        <a href="/capybreak/support/">Support</a>
+        <a href="/capybreak/accessibility/">Accessibility</a>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,3 @@
+Copyright 2026 Alfred Strabel. All rights reserved.
+
+The CapyBreak artwork and screenshots in this directory are not licensed under the repository's MIT License.

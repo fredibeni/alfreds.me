@@ -5,10 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="color-scheme" content="dark" />
   <meta name="theme-color" content="#0f1621" />
-  <title>Alfred</title>
+  <meta name="description" content="Personal projects by Alfred Strabel, including CapyBreak and Best Place." />
+  <link rel="canonical" href="https://alfreds.me/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Alfred Strabel - Projects" />
+  <meta property="og:description" content="Personal projects by Alfred Strabel, including CapyBreak and Best Place." />
+  <meta property="og:url" content="https://alfreds.me/" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Alfred Strabel - Projects" />
+  <meta name="twitter:description" content="Personal projects by Alfred Strabel, including CapyBreak and Best Place." />
+  <title>Alfred Strabel - Projects</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Sono:wght@200..800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Sono:wght@200..800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet" />
   <style>
     :root {
       color-scheme: dark;
@@ -73,6 +82,12 @@
       background: var(--card-hover);
       border-color: #3d5170;
     }
+    a.card + a.card { margin-top: 16px; }
+    a.card:focus-visible,
+    .profile:focus-visible {
+      outline: 3px solid var(--accent);
+      outline-offset: 4px;
+    }
     .card-body { display: flex; align-items: center; gap: 22px; }
     .card-text { flex: 1; min-width: 0; }
     .card h2 {
@@ -91,6 +106,10 @@
       .card-body { flex-direction: column; align-items: stretch; gap: 18px; }
       .thumb { width: 100%; order: 2; }
       .card-text { order: 1; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      a.card { transition: none; }
+      a.card:hover { transform: none; }
     }
   </style>
 </head>
@@ -113,6 +132,15 @@
 
     <main>
       <div class="section-label">Projects</div>
+      <a class="card" href="/capybreak/">
+        <div class="card-body">
+          <div class="card-text">
+            <h2>CapyBreak</h2>
+            <p>A furry Mac menu bar reminder to get up regularly.</p>
+          </div>
+          <img class="thumb" src="/capybreak/assets/capybreak-thumb-v1.webp" width="840" height="525" alt="" />
+        </div>
+      </a>
       <a class="card" href="/best-place/">
         <div class="card-body">
           <div class="card-text">
