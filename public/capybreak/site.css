@@ -18,10 +18,14 @@
 html {
   background: var(--background);
   scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
   margin: 0;
+  padding-right: env(safe-area-inset-right);
+  padding-left: env(safe-area-inset-left);
   background: var(--background);
   color: var(--text);
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -44,7 +48,6 @@ a:hover {
 }
 
 a:focus-visible,
-.store-status:focus-visible,
 .project-detail summary:focus-visible {
   border-radius: 5px;
   outline: 3px solid var(--accent);
@@ -70,6 +73,9 @@ a:focus-visible,
 }
 
 .back-link {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
   color: var(--muted);
   font-size: 15px;
   font-weight: 600;
@@ -108,7 +114,8 @@ a:focus-visible,
 
 h1,
 h2,
-h3 {
+h3,
+h4 {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   line-height: 1.15;
 }
@@ -202,6 +209,16 @@ h1 {
   background: #0d1926;
 }
 
+.shot-image-link {
+  display: block;
+  cursor: zoom-in;
+}
+
+.shot-image-link:focus-visible {
+  border-radius: 14px 14px 0 0;
+  outline-offset: -5px;
+}
+
 .shot figcaption {
   min-height: 66px;
   padding: 15px 17px;
@@ -277,6 +294,16 @@ h1 {
   display: none;
 }
 
+.project-detail summary:focus-visible {
+  outline-offset: -4px;
+}
+
+.project-detail summary h3 {
+  margin: 0;
+  color: inherit;
+  font: inherit;
+}
+
 .project-detail summary::after {
   content: "+";
   color: var(--accent);
@@ -294,13 +321,13 @@ h1 {
   padding: 22px 20px 24px;
 }
 
-.project-detail-content h3 {
+.project-detail-content h4 {
   margin: 28px 0 9px;
   font-size: 18px;
   font-weight: 500;
 }
 
-.project-detail-content h3:first-child,
+.project-detail-content h4:first-child,
 .project-detail-content > :first-child {
   margin-top: 0;
 }
@@ -346,18 +373,25 @@ code {
   border-radius: 5px;
   background: var(--surface);
   color: var(--text);
+  overflow-wrap: anywhere;
   padding: 2px 5px;
   font-size: 0.88em;
+  word-break: break-word;
 }
 
 @media (max-width: 800px) {
-  .gallery,
-  .feature-grid {
+  .gallery {
     grid-template-columns: 1fr;
   }
 
   .shot figcaption {
     min-height: 0;
+  }
+}
+
+@media (max-width: 680px) {
+  .feature-grid {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -369,17 +403,29 @@ code {
 
   .site-nav {
     align-items: flex-start;
-    padding-top: 20px;
+    padding-top: max(20px, env(safe-area-inset-top));
   }
 
   .hero {
     grid-template-columns: 88px minmax(0, 1fr);
-    align-items: start;
-    gap: 20px;
-    padding: 52px 0 46px;
+    grid-template-areas:
+      "icon title"
+      "icon tagline"
+      "copy copy"
+      "actions actions";
+    align-items: center;
+    column-gap: 20px;
+    row-gap: 0;
+    padding: 36px 0 40px;
+  }
+
+  .hero > div {
+    display: contents;
   }
 
   .app-icon {
+    grid-area: icon;
+    align-self: start;
     width: 88px;
     height: 88px;
     border-radius: 20px;
@@ -390,19 +436,27 @@ code {
   }
 
   .hero h1 {
-    font-size: clamp(37px, 13vw, 54px);
+    grid-area: title;
+    align-self: end;
+    font-size: clamp(35px, 10vw, 48px);
   }
 
   .tagline {
-    margin-top: 8px;
+    grid-area: tagline;
+    align-self: start;
+    margin-top: 4px;
   }
 
   .hero-copy {
-    margin-top: -8px;
+    grid-area: copy;
+    margin-top: 18px;
   }
 
   .hero-actions {
-    margin-top: 2px;
+    display: grid;
+    grid-area: actions;
+    gap: 12px;
+    margin-top: 20px;
   }
 
   .store-status {
@@ -411,8 +465,24 @@ code {
     text-align: center;
   }
 
+  .requirements {
+    text-align: center;
+  }
+
+  .intro-section {
+    padding-top: 38px;
+  }
+
   .section {
-    padding-top: 48px;
+    padding-top: 42px;
+  }
+
+  .notice {
+    padding: 16px;
+  }
+
+  .project-details {
+    margin-bottom: calc(32px + env(safe-area-inset-bottom));
   }
 
 }
@@ -424,17 +494,14 @@ code {
 
   .hero {
     grid-template-columns: 72px minmax(0, 1fr);
-    gap: 15px;
+    column-gap: 15px;
+    row-gap: 0;
   }
 
   .app-icon {
     width: 72px;
     height: 72px;
     border-radius: 16px;
-  }
-
-  .hero h1 {
-    font-size: 35px;
   }
 
   .feature,
@@ -445,6 +512,48 @@ code {
   .project-detail summary {
     min-height: 58px;
     padding: 14px 18px;
+  }
+}
+
+@media (min-width: 621px) and (orientation: landscape) and (max-height: 500px) {
+  .site-nav {
+    padding-top: max(12px, env(safe-area-inset-top));
+  }
+
+  .hero {
+    grid-template-columns: 96px minmax(0, 1fr);
+    gap: 24px;
+    padding: 28px 0 32px;
+  }
+
+  .app-icon {
+    width: 96px;
+    height: 96px;
+    border-radius: 22px;
+  }
+
+  .hero h1 {
+    font-size: clamp(44px, 7vw, 58px);
+  }
+
+  .tagline {
+    margin-top: 6px;
+  }
+
+  .hero-copy {
+    margin-top: 12px;
+  }
+
+  .hero-actions {
+    margin-top: 18px;
+  }
+
+  .intro-section {
+    padding-top: 36px;
+  }
+
+  .section {
+    padding-top: 40px;
   }
 }
 
