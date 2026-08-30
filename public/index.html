@@ -82,7 +82,11 @@
       background: var(--card-hover);
       border-color: #3d5170;
     }
-    a.card + a.card { margin-top: 16px; }
+    .project-cards {
+      display: grid;
+      grid-auto-rows: 1fr;
+      gap: 16px;
+    }
     a.card:focus-visible,
     .profile:focus-visible {
       outline: 3px solid var(--accent);
@@ -97,14 +101,16 @@
     }
     .card p { margin: 8px 0 0; color: var(--muted); font-size: 16px; }
     .thumb {
-      width: 176px; height: auto; flex-shrink: 0;
+      width: 176px; height: 88px; flex-shrink: 0;
+      object-fit: contain;
+      background: #111b28;
       border-radius: 9px; border: 1px solid var(--line);
       display: block;
     }
     @media (max-width: 620px) {
       header { padding: 44px 0 20px; }
       .card-body { flex-direction: column; align-items: stretch; gap: 18px; }
-      .thumb { width: 100%; order: 2; }
+      .thumb { width: 100%; height: auto; aspect-ratio: 2 / 1; order: 2; }
       .card-text { order: 1; }
     }
     @media (prefers-reduced-motion: reduce) {
@@ -132,24 +138,26 @@
 
     <main>
       <div class="section-label">Projects</div>
-      <a class="card" href="/capybreak/">
-        <div class="card-body">
-          <div class="card-text">
-            <h2>CapyBreak</h2>
-            <p>A furry reminder to get up regularly while working on your Mac.</p>
+      <div class="project-cards">
+        <a class="card" href="/capybreak/">
+          <div class="card-body">
+            <div class="card-text">
+              <h2>CapyBreak</h2>
+              <p>A furry reminder to get up regularly while working on your Mac.</p>
+            </div>
+            <img class="thumb" src="/capybreak/assets/capybreak-thumb-v3.webp" width="840" height="420" alt="" />
           </div>
-          <img class="thumb" src="/capybreak/assets/capybreak-thumb-v3.webp" width="840" height="525" alt="" />
-        </div>
-      </a>
-      <a class="card" href="/best-place/">
-        <div class="card-body">
-          <div class="card-text">
-            <h2>Best Place</h2>
-            <p>Find where to live: filter world cities by tax, cost of living, climate, etc.</p>
+        </a>
+        <a class="card" href="/best-place/">
+          <div class="card-body">
+            <div class="card-text">
+              <h2>Best Place</h2>
+              <p>Find where to live: filter world cities by tax, cost of living, climate, etc.</p>
+            </div>
+            <img class="thumb" src="/best-place-thumb.jpg" width="420" height="210" loading="lazy" alt="World map showing the cities covered by Best Place" />
           </div>
-          <img class="thumb" src="/best-place-thumb.jpg" width="420" height="210" loading="lazy" alt="World map showing the cities covered by Best Place" />
-        </div>
-      </a>
+        </a>
+      </div>
     </main>
   </div>
   <script defer src="/_vercel/insights/script.js"></script>
