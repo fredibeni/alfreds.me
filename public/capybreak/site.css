@@ -160,6 +160,14 @@ h1 {
   color: var(--accent-strong);
   padding: 10px 16px;
   font-weight: 650;
+  text-decoration: none;
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease;
+}
+
+.store-status:hover {
+  border-color: rgba(110, 231, 220, 0.75);
+  background: rgba(110, 231, 220, 0.16);
+  color: #bcfff9;
 }
 
 .requirements {
