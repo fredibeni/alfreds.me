@@ -8,4 +8,6 @@ await mkdir("dist", { recursive: true });
 await cp("public", "dist", { recursive: true });
 await cp("apps/best-place/dist", "dist/best-place", { recursive: true });
 
-console.log("Assembled dist/ (landing + /capybreak/ + /best-place/)");
+console.log(
+  "Assembled dist/ (landing + /matraix-persona-testing/ + /capybreak/ + /best-place/)",
+);
