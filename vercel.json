@@ -7,6 +7,12 @@
   "trailingSlash": true,
   "headers": [
     {
+      "source": "/matraix-persona-testing/assets/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
+    },
+    {
       "source": "/capybreak/assets/(.*)",
       "headers": [
         { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }

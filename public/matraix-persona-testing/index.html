@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#0f1621">
+  <meta name="description" content="A local macOS app for chatting with a personalised AI, updating its persona and measuring how closely its answers match yours.">
+  <link rel="canonical" href="https://alfreds.me/matraix-persona-testing/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="MatrAIx Persona Testing - Build and test your AI persona">
+  <meta property="og:description" content="Chat with a personalised AI, fill gaps in its persona and measure how closely its answers match yours.">
+  <meta property="og:url" content="https://alfreds.me/matraix-persona-testing/">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="MatrAIx Persona Testing - Build and test your AI persona">
+  <meta name="twitter:description" content="Chat with a personalised AI, fill gaps in its persona and measure how closely its answers match yours.">
+  <title>MatrAIx Persona Testing - Build and test your AI persona</title>
+  <link rel="stylesheet" href="/matraix-persona-testing/site.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareSourceCode",
+    "name": "MatrAIx Persona Testing",
+    "description": "A local macOS app for chatting with a personalised AI, updating its persona and comparing its answers with human benchmarks.",
+    "codeRepository": "https://github.com/fredibeni/MatrAIx-Persona-Testing",
+    "programmingLanguage": ["TypeScript", "Python"],
+    "runtimePlatform": "macOS",
+    "url": "https://alfreds.me/matraix-persona-testing/"
+  }
+  </script>
+</head>
+<body>
+  <nav class="site-nav shell" aria-label="MatrAIx Persona Testing">
+    <a class="back-link" href="/">Back to projects</a>
+  </nav>
+
+  <main>
+    <header class="hero shell">
+      <p class="eyebrow">Local AI persona lab</p>
+      <h1>MatrAIx Persona Testing</h1>
+      <p class="tagline">Explore how closely an AI persona reflects you.</p>
+      <p class="hero-copy">A local Mac app for chatting with a personalised agent, filling gaps in its persona and measuring how closely its answers match yours.</p>
+      <div class="hero-actions">
+        <a class="primary-link" href="https://github.com/fredibeni/MatrAIx-Persona-Testing" target="_blank" rel="external noopener">View project on GitHub</a>
+        <span class="requirements">macOS - ChatGPT sign-in - no separate API key or Docker</span>
+      </div>
+    </header>
+
+    <section class="intro-section shell" aria-labelledby="what-it-does">
+      <h2 class="eyebrow" id="what-it-does">What it does</h2>
+      <p>Start with a local persona built from sources you approve. Talk to it, answer targeted questions to make it more complete, then compare repeated agent responses with your own benchmark answers.</p>
+    </section>
+
+    <section class="section shell" aria-labelledby="screenshots-title">
+      <div class="section-heading-row">
+        <h2 class="section-heading" id="screenshots-title">Three ways to test a persona</h2>
+        <p class="demo-note">Screenshots use a privacy-safe demo persona and demo validation data.</p>
+      </div>
+      <div class="gallery">
+        <figure class="shot">
+          <a class="shot-image-link" href="/matraix-persona-testing/assets/01-chat.jpg" aria-label="View the persona chat screenshot full size">
+            <img src="/matraix-persona-testing/assets/01-chat.jpg" width="1280" height="720" loading="lazy" decoding="async" alt="MatrAIx chat showing a question and a reply from Digital Alfred">
+          </a>
+          <figcaption><strong>Chat.</strong> Have a direct conversation with the agent defined by your local persona.</figcaption>
+        </figure>
+        <figure class="shot">
+          <a class="shot-image-link" href="/matraix-persona-testing/assets/02-update-persona.jpg" aria-label="View the persona update screenshot full size">
+            <img src="/matraix-persona-testing/assets/02-update-persona.jpg" width="1280" height="720" loading="lazy" decoding="async" alt="MatrAIx Update persona screen asking how directly the user communicates">
+          </a>
+          <figcaption><strong>Update persona.</strong> Answer focused questions that fill unresolved personality dimensions and save them to the active persona.</figcaption>
+        </figure>
+        <figure class="shot shot-wide">
+          <a class="shot-image-link" href="/matraix-persona-testing/assets/03-validation.jpg" aria-label="View the validation results screenshot full size">
+            <img src="/matraix-persona-testing/assets/03-validation.jpg" width="1280" height="720" loading="lazy" decoding="async" alt="MatrAIx Validation results showing benchmark match and agent consistency charts">
+          </a>
+          <figcaption><strong>Validation.</strong> Compare your benchmark answers with repeated agent runs, then track answer similarity and consistency.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="section shell project-notes" aria-labelledby="project-notes-title">
+      <h2 class="section-heading" id="project-notes-title">Project notes</h2>
+      <div class="note-grid">
+        <article class="note-card">
+          <h3>Independent adaptation</h3>
+          <p>This is an independent testing adaptation of the original <a href="https://github.com/MatrAIx-ai/MatrAIx-Persona-8B" target="_blank" rel="external noopener">MatrAIx-Persona-8B</a> project.</p>
+        </article>
+        <article class="note-card">
+          <h3>Local and lightweight</h3>
+          <p>The app runs on localhost, while persona files, survey answers and validation results stay in ignored local paths. Model-backed onboarding, chat and validation send approved inputs to OpenAI through Codex.</p>
+        </article>
+      </div>
+      <p class="source-note">Normal use needs no separate OpenAI API key, Docker or local model download. The app, installation steps and technical documentation remain in the <a href="https://github.com/fredibeni/MatrAIx-Persona-Testing" target="_blank" rel="external noopener">existing GitHub repository</a>.</p>
+    </section>
+  </main>
+</body>
+</html>

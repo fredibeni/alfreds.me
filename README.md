@@ -7,6 +7,7 @@ Source for my personal website, built as a static site and deployed on [Vercel](
 ```
 ├── public/                  # Landing page and static project pages
 │   ├── index.html           # Home page
+│   ├── matraix-persona-testing/ # MatrAIx Persona Testing page and screenshots
 │   ├── capybreak/           # CapyBreak page, assets and shared styles
 │   ├── robots.txt
 │   └── sitemap.xml
@@ -32,6 +33,15 @@ Source for my personal website, built as a static site and deployed on [Vercel](
 The landing page is plain HTML with no build step - edit `public/index.html` directly.
 
 ## Projects
+
+### MatrAIx Persona Testing
+
+A local macOS app for building an AI persona, chatting with it, filling missing traits
+and comparing its survey answers with the user's own benchmarks. Its static project
+page and privacy-safe demo screenshots live under `public/matraix-persona-testing/`.
+The app itself remains in the separate
+[`fredibeni/MatrAIx-Persona-Testing`](https://github.com/fredibeni/MatrAIx-Persona-Testing)
+repository.
 
 ### CapyBreak
 
