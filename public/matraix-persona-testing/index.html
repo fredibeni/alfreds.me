@@ -42,19 +42,30 @@
       <p class="hero-copy">A local Mac app for chatting with a personalised agent, filling gaps in its persona and measuring how closely its answers match yours.</p>
       <div class="hero-actions">
         <a class="primary-link" href="https://github.com/fredibeni/MatrAIx-Persona-Testing" target="_blank" rel="external noopener">View project on GitHub</a>
-        <span class="requirements">macOS - ChatGPT sign-in - no separate API key or Docker</span>
+        <span class="requirements">macOS - ChatGPT sign-in - no separate API key</span>
       </div>
     </header>
 
     <section class="intro-section shell" aria-labelledby="what-it-does">
       <h2 class="eyebrow" id="what-it-does">What it does</h2>
-      <p>Start with a local persona built from sources you approve. Talk to it, answer targeted questions to make it more complete, then compare repeated agent responses with your own benchmark answers.</p>
+      <p>On first start up, the app asks you to fill in a list of personality dimensions from your ChatGPT history and memory.</p>
+      <p>Then there are three functionalities:</p>
+      <ol>
+        <li><strong>Chat</strong> directly with the personalised agent based on your local persona YAML.</li>
+        <li><strong>Update persona</strong> by answering questions on the missing personality dimensions.</li>
+        <li><strong>Validate</strong> how similar the agent's answers are to yours on a set of questions.
+          <ul>
+            <li>You answer the questions once, then they are used as the benchmark.</li>
+            <li>It is recommended to run Validation each time you add a batch of new personality dimensions.</li>
+            <li>The similarity of the agent's answers to your benchmark is summarised and visualised.</li>
+          </ul>
+        </li>
+      </ol>
     </section>
 
     <section class="section shell" aria-labelledby="screenshots-title">
       <div class="section-heading-row">
-        <h2 class="section-heading" id="screenshots-title">Three ways to test a persona</h2>
-        <p class="demo-note">Screenshots use a privacy-safe demo persona and demo validation data.</p>
+        <h2 class="section-heading" id="screenshots-title">Screenshots</h2>
       </div>
       <div class="gallery">
         <figure class="shot">
@@ -90,7 +101,7 @@
           <p>The app runs on localhost, while persona files, survey answers and validation results stay in ignored local paths. Model-backed onboarding, chat and validation send approved inputs to OpenAI through Codex.</p>
         </article>
       </div>
-      <p class="source-note">Normal use needs no separate OpenAI API key, Docker or local model download. The app, installation steps and technical documentation remain in the <a href="https://github.com/fredibeni/MatrAIx-Persona-Testing" target="_blank" rel="external noopener">existing GitHub repository</a>.</p>
+      <p class="source-note">Normal use needs no separate OpenAI API key or local model download. The app, installation steps and technical documentation remain in the <a href="https://github.com/fredibeni/MatrAIx-Persona-Testing" target="_blank" rel="external noopener">existing GitHub repository</a>.</p>
     </section>
   </main>
 </body>
