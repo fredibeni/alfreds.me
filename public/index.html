@@ -107,10 +107,25 @@
       border-radius: 9px; border: 1px solid var(--line);
       display: block;
     }
+    .matraix-thumb-frame {
+      width: 176px; height: 88px; flex-shrink: 0;
+      overflow: hidden;
+      background: #111b28;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+    }
+    .matraix-thumb-frame .thumb {
+      width: 100%; height: 100%;
+      border: 0; border-radius: 0;
+      object-fit: cover;
+      transform: scale(1.35);
+    }
     @media (max-width: 620px) {
       header { padding: 44px 0 20px; }
       .card-body { flex-direction: column; align-items: stretch; gap: 18px; }
       .thumb { width: 100%; height: auto; aspect-ratio: 2 / 1; order: 2; }
+      .matraix-thumb-frame { width: 100%; height: auto; aspect-ratio: 2 / 1; order: 2; }
+      .matraix-thumb-frame .thumb { width: 100%; height: 100%; }
       .card-text { order: 1; }
     }
     @media (prefers-reduced-motion: reduce) {
@@ -145,7 +160,9 @@
               <h2>MatrAIx Persona Testing</h2>
               <p>Create and chat with a personalised agent, fill gaps in its persona and measure how closely its answers match yours.</p>
             </div>
-            <img class="thumb" src="/matraix-persona-testing/assets/matraix-thumb-v2.png" width="1774" height="887" alt="MatrAIx controls for Chat, Update persona and Validation" />
+            <span class="matraix-thumb-frame">
+              <img class="thumb" src="/matraix-persona-testing/assets/matraix-thumb-v2.png" width="1774" height="887" alt="MatrAIx controls for Chat, Update persona and Validation" />
+            </span>
           </div>
         </a>
         <a class="card" href="/capybreak/">
