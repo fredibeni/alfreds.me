@@ -81,7 +81,7 @@ a:focus-visible {
 
 .hero {
   max-width: 920px;
-  padding-top: 72px;
+  padding-top: 40px;
   padding-bottom: 64px;
 }
 
@@ -160,7 +160,6 @@ h1 {
 }
 
 .intro-section {
-  border-top: 1px solid var(--line);
   padding: 54px 0 14px;
 }
 
