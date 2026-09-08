@@ -37,7 +37,7 @@
   <main>
     <header class="hero shell">
       <h1>MatrAIx Persona Testing</h1>
-      <p class="tagline">Explore how closely an AI persona can reflect you.</p>
+      <p class="tagline">Create and test an AI persona to mimic you</p>
       <p class="hero-copy">A local Mac app for chatting with a personalised agent, filling gaps in its persona and measuring how closely its answers match yours.</p>
       <div class="hero-actions">
         <a class="primary-link" href="https://github.com/fredibeni/MatrAIx-Persona-Testing" target="_blank" rel="external noopener">View project on GitHub</a>
@@ -47,6 +47,11 @@
 
     <section class="intro-section shell" aria-labelledby="what-it-does">
       <h2 class="eyebrow" id="what-it-does">What it does</h2>
+      <p>Build a replica of your personality as a collection of dimensions. Measure how a ChatGPT agent with this persona matches your answers on a set surveys, and how its answers improve the more dimensions you fill in.</p>
+    </section>
+
+    <section class="intro-section shell" aria-labelledby="details-title">
+      <h2 class="eyebrow" id="details-title">Details</h2>
       <p>On first start up, the app asks you to fill in a list of personality dimensions from your ChatGPT history and memory.</p>
       <p>Then there are three functionalities:</p>
       <ol>
@@ -62,7 +67,22 @@
       </ol>
     </section>
 
-    <section class="section shell" aria-labelledby="screenshots-title">
+    <section class="section shell project-notes" aria-labelledby="project-notes-title">
+      <h2 class="section-heading" id="project-notes-title">Project notes</h2>
+      <div class="note-grid">
+        <article class="note-card">
+          <h3>Local and lightweight</h3>
+          <p>The app runs on localhost, while persona files, survey answers and validation results stay in ignored local paths. Model-backed onboarding, chat and validation send approved inputs to OpenAI through Codex.</p>
+        </article>
+        <article class="note-card">
+          <h3>Independent adaptation</h3>
+          <p>This is an independent testing adaptation of the original <a href="https://github.com/MatrAIx-ai/MatrAIx-Persona-8B" target="_blank" rel="external noopener">MatrAIx-Persona-8B</a> project.</p>
+        </article>
+      </div>
+      <p class="source-note">Normal use needs no separate OpenAI API key or local model download. The app, installation steps and technical documentation remain in the <a href="https://github.com/fredibeni/MatrAIx-Persona-Testing" target="_blank" rel="external noopener">existing GitHub repository</a>.</p>
+    </section>
+
+    <section class="section shell screenshots-section" aria-labelledby="screenshots-title">
       <div class="section-heading-row">
         <h2 class="section-heading" id="screenshots-title">Screenshots</h2>
       </div>
@@ -79,28 +99,13 @@
           </a>
           <figcaption><strong>Update persona.</strong> Answer focused questions that fill unresolved personality dimensions and save them to the active persona.</figcaption>
         </figure>
-        <figure class="shot shot-wide">
+        <figure class="shot">
           <a class="shot-image-link" href="/matraix-persona-testing/assets/03-validation.jpg" aria-label="View the validation results screenshot full size">
             <img src="/matraix-persona-testing/assets/03-validation.jpg" width="1280" height="720" loading="lazy" decoding="async" alt="MatrAIx Validation results showing benchmark match and agent consistency charts">
           </a>
           <figcaption><strong>Validation.</strong> Compare your benchmark answers with repeated agent runs, then track answer similarity and consistency.</figcaption>
         </figure>
       </div>
-    </section>
-
-    <section class="section shell project-notes" aria-labelledby="project-notes-title">
-      <h2 class="section-heading" id="project-notes-title">Project notes</h2>
-      <div class="note-grid">
-        <article class="note-card">
-          <h3>Local and lightweight</h3>
-          <p>The app runs on localhost, while persona files, survey answers and validation results stay in ignored local paths. Model-backed onboarding, chat and validation send approved inputs to OpenAI through Codex.</p>
-        </article>
-        <article class="note-card">
-          <h3>Independent adaptation</h3>
-          <p>This is an independent testing adaptation of the original <a href="https://github.com/MatrAIx-ai/MatrAIx-Persona-8B" target="_blank" rel="external noopener">MatrAIx-Persona-8B</a> project.</p>
-        </article>
-      </div>
-      <p class="source-note">Normal use needs no separate OpenAI API key or local model download. The app, installation steps and technical documentation remain in the <a href="https://github.com/fredibeni/MatrAIx-Persona-Testing" target="_blank" rel="external noopener">existing GitHub repository</a>.</p>
     </section>
   </main>
 </body>
