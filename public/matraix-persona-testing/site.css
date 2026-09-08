@@ -103,9 +103,9 @@ h3 {
 }
 
 h1 {
-  max-width: 14ch;
+  max-width: none;
   margin: 0;
-  font-size: clamp(46px, 8vw, 78px);
+  font-size: clamp(46px, 5vw, 64px);
   font-weight: 350;
   letter-spacing: -0.015em;
 }
@@ -169,6 +169,32 @@ h1 {
   margin: 0;
   color: var(--muted);
   font-size: clamp(19px, 2.3vw, 23px);
+}
+
+.intro-section p + p {
+  margin-top: 24px;
+}
+
+.intro-section ol {
+  max-width: 900px;
+  margin: 16px 0 0;
+  padding-left: 1.35em;
+  color: var(--muted);
+  font-size: clamp(19px, 2.3vw, 23px);
+}
+
+.intro-section li + li {
+  margin-top: 10px;
+}
+
+.intro-section li::marker {
+  color: var(--accent);
+}
+
+.intro-section ul {
+  margin: 10px 0 0;
+  padding-left: 1.35em;
+  font-size: 0.78em;
 }
 
 .section {
