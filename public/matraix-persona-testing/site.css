@@ -160,6 +160,7 @@ h1 {
 }
 
 .intro-section {
+  border-top: 1px solid var(--line);
   padding: 54px 0 14px;
 }
 
@@ -200,6 +201,10 @@ h1 {
 .details-section ol,
 .details-section ul {
   font-size: 15px;
+}
+
+.details-section {
+  border-top: 0;
 }
 
 .section {
