@@ -81,7 +81,7 @@ a:focus-visible {
 
 .hero {
   max-width: 920px;
-  padding-top: 72px;
+  padding-top: 40px;
   padding-bottom: 64px;
 }
 
@@ -197,6 +197,16 @@ h1 {
   font-size: 0.78em;
 }
 
+.details-section p,
+.details-section ol,
+.details-section ul {
+  font-size: 15px;
+}
+
+.details-section {
+  border-top: 0;
+}
+
 .section {
   padding-top: 62px;
 }
@@ -225,7 +235,7 @@ h1 {
 
 .gallery {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr);
   gap: 18px;
 }
 
@@ -235,10 +245,6 @@ h1 {
   border: 1px solid var(--line);
   border-radius: 16px;
   background: var(--surface);
-}
-
-.shot-wide {
-  grid-column: 1 / -1;
 }
 
 .shot img {
@@ -272,10 +278,15 @@ h1 {
 }
 
 .project-notes {
+  padding-bottom: 0;
+}
+
+.screenshots-section {
   padding-bottom: calc(64px + env(safe-area-inset-bottom));
 }
 
-.project-notes > .section-heading {
+.project-notes > .section-heading,
+.details-section > .section-heading {
   margin-bottom: 22px;
 }
 
@@ -324,10 +335,6 @@ h1 {
   .gallery,
   .note-grid {
     grid-template-columns: 1fr;
-  }
-
-  .shot-wide {
-    grid-column: auto;
   }
 
   .shot figcaption {
