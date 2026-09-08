@@ -197,6 +197,12 @@ h1 {
   font-size: 0.78em;
 }
 
+.details-section p,
+.details-section ol,
+.details-section ul {
+  font-size: 17px;
+}
+
 .section {
   padding-top: 62px;
 }
