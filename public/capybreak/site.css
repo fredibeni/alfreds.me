@@ -91,7 +91,7 @@ a:focus-visible,
   grid-template-columns: 132px minmax(0, 1fr);
   align-items: center;
   gap: 34px;
-  padding: 78px 0 64px;
+  padding: 40px 0 64px;
 }
 
 .app-icon {
