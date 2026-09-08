@@ -285,7 +285,8 @@ h1 {
   padding-bottom: calc(64px + env(safe-area-inset-bottom));
 }
 
-.project-notes > .section-heading {
+.project-notes > .section-heading,
+.details-section > .section-heading {
   margin-bottom: 22px;
 }
 
